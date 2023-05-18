@@ -161,7 +161,9 @@ class _LoanState extends State<Loan> {
         stream: stream,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return const Center(child: Text("Something went wrong"));
+            return const Center(
+                child: Text("Something went wrong",
+                    style: TextStyle(color: Colors.red)));
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -218,24 +220,33 @@ class _LoanState extends State<Loan> {
                   backgroundImage: NetworkImage(
                       "https://avatars.githubusercontent.com/u/61448739?v=4"),
                 ),
-                title: Row(
+                title: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(formatAmount(transaction.amount),
+                    Row(
+                      children: [
+                        Text(formatAmount(transaction.amount),
+                            style: const TextStyle(
+                                fontSize: 15, color: Colors.black)),
+                        Container(
+                          margin: const EdgeInsets.only(left: 5.0),
+                          padding: const EdgeInsets.all(2.0),
+                          decoration: BoxDecoration(
+                            color: transaction.transactionType == "principal"
+                                ? Colors.green.shade200
+                                : Colors.blue.shade200,
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          child: Text(transaction.transactionType,
+                              style: const TextStyle(
+                                  fontSize: 10, color: Colors.black)),
+                        )
+                      ],
+                    ),
+                    Text(transaction.dueDate.toIso8601String().split("T")[0],
                         style:
-                            const TextStyle(fontSize: 15, color: Colors.black)),
-                    Container(
-                      margin: const EdgeInsets.only(left: 5.0),
-                      padding: const EdgeInsets.all(2.0),
-                      decoration: BoxDecoration(
-                        color: transaction.transactionType == "principal"
-                            ? Colors.green.shade200
-                            : Colors.blue.shade200,
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                      child: Text(transaction.transactionType,
-                          style: const TextStyle(
-                              fontSize: 10, color: Colors.black)),
-                    )
+                            const TextStyle(fontSize: 12, color: Colors.grey)),
                   ],
                 ),
                 subtitle: Text(transaction.description ?? "",

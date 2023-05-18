@@ -41,17 +41,18 @@ class TransactionForm extends StatelessWidget {
                   return Transaction(loan: loan);
                 }
                 // calculate for last transaction with type intrest and return the last transaction with loan
-                TransactionModel? lastTransaction =
+                List<TransactionModel>? lastTransactions =
                     _calculateLastTransaction(snapshot.data!.docs);
                 return Transaction(
-                    loan: loan, lastTransaction: lastTransaction);
+                    loan: loan, lastTransaction: lastTransactions);
               }));
     }));
   }
 
-  TransactionModel? _calculateLastTransaction(
+  List<TransactionModel>? _calculateLastTransaction(
       List<QueryDocumentSnapshot<Object?>> docs) {
     TransactionModel? lastTransaction;
+    List<TransactionModel> transactions = [];
     for (var doc in docs) {
       TransactionModel transaction =
           TransactionModel.fromJson(doc.data() as Map<String, dynamic>);
@@ -67,13 +68,26 @@ class TransactionForm extends StatelessWidget {
         }
       }
     }
-    return lastTransaction;
+    print('last transaction ${lastTransaction?.amount}');
+
+    for (var doc in docs) {
+      TransactionModel transaction =
+          TransactionModel.fromJson(doc.data() as Map<String, dynamic>);
+      if (transaction.transactionType == 'interest') {
+        if (transaction.dueDate == lastTransaction!.dueDate) {
+          transactions.add(transaction);
+        }
+      }
+    }
+    // print('last transaction ${lastTransaction?.amount}');
+    print('transactions ${transactions.length}');
+    return transactions;
   }
 }
 
 class Transaction extends StatefulWidget {
   final LoanModel loan;
-  final TransactionModel? lastTransaction;
+  final List<TransactionModel>? lastTransaction;
   const Transaction({Key? key, required this.loan, this.lastTransaction})
       : super(key: key);
 
@@ -88,13 +102,14 @@ class _TransactionState extends State<Transaction> {
   final TextEditingController _dateController = TextEditingController();
   late DateTime _dueDate;
   late String _transactionType;
+  double totalIntrest = 0.0;
 
   @override
   void initState() {
     super.initState();
     _transactionType = 'interest'; // set the default transaction type
     _dateController.text = DateFormat('dd-MM-yyyy').format(DateTime.now());
-    print('last transaction ${widget.lastTransaction?.amount}');
+    // print('last transaction ${widget.lastTransaction?.amount}');
     // _dueDate = widget.loan.date.month < 12
     //     ? DateTime(widget.loan.date.year, widget.loan.date.month + 1,
     //         widget.loan.date.day)
@@ -102,7 +117,7 @@ class _TransactionState extends State<Transaction> {
 
     // use the last transaction due date as the due date for the new transaction
     if (widget.lastTransaction != null) {
-      _dueDate = widget.lastTransaction!.dueDate;
+      _dueDate = widget.lastTransaction![0].dueDate;
     } else {
       _dueDate = widget.loan.date.month < 12
           ? DateTime(widget.loan.date.year, widget.loan.date.month + 1,
@@ -120,6 +135,7 @@ class _TransactionState extends State<Transaction> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
+      totalIntrest = calculateTotalIntrest(widget.lastTransaction!);
       List<TransactionModel> transactions = _calculateTransaction();
 
       FirestoreService().addTransaction(transactions).then((value) {
@@ -140,6 +156,16 @@ class _TransactionState extends State<Transaction> {
     }
   }
 
+  // calculate interest on last transactions
+  calculateTotalIntrest(List<TransactionModel> transactions) {
+    print(
+        'calculateTotalIntrest ${transactions.length}**************************************************');
+    for (var transaction in transactions) {
+      totalIntrest += transaction.amount;
+    }
+    return totalIntrest;
+  }
+
   List<TransactionModel> _calculateTransaction() {
     List<TransactionModel> transactions = [];
     double amount = double.parse(_amountController.text);
@@ -149,10 +175,10 @@ class _TransactionState extends State<Transaction> {
 
     if (_transactionType == 'interest') {
       double amountLeft = amount;
+
       // if the last transaction interest is less than the interest amount then add the difference to the new transaction and then add the new transaction
-      if (widget.lastTransaction != null &&
-          widget.lastTransaction!.amount < interestAmount) {
-        double difference = interestAmount - widget.lastTransaction!.amount;
+      if (widget.lastTransaction != null && totalIntrest < interestAmount) {
+        double difference = interestAmount - totalIntrest;
         // check if the amountLeft is greater than the difference
         if (amountLeft > difference) {
           amountLeft -= difference;
@@ -331,11 +357,10 @@ class _TransactionState extends State<Transaction> {
   }
 }
 
-
 // Issue last month trasaction complete but not in case if i only take last transaction it will lbe always less from intrest and create issue
 
-// eg: intrest 2000 1st payment 1000 2nd payment 1000 it will check last as 1000 and store it in that month 
-//but next time when i chcek last transaction its 1000 whcih is less then 2000 and so it will again try to divide 
-//the nest intrest to fulfill last one 
+// eg: intrest 2000 1st payment 1000 2nd payment 1000 it will check last as 1000 and store it in that month
+//but next time when i chcek last transaction its 1000 whcih is less then 2000 and so it will again try to divide
+//the nest intrest to fulfill last one
 
 // month intrest complete in transaction model an idea!!

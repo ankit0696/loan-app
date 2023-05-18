@@ -135,6 +135,7 @@ class FirestoreService {
           .where('loanId', isEqualTo: loanId)
           .where('borrowerId', isEqualTo: borrowerId)
           .where('lenderId', isEqualTo: AuthService().user.uid)
+          .orderBy('createdDate', descending: true)
           .snapshots();
     } catch (e) {
       print(e);
