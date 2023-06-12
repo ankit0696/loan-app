@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:loan_app/ui/views/bording_screen/bording_screen.dart';
 import 'package:loan_app/ui/views/home.dart';
 import 'package:loan_app/ui/views/sign_in.dart';
 import 'package:loan_app/ui/views/splash_screen.dart';
@@ -55,7 +56,7 @@ class _AuthCheckState extends State<AuthCheck> {
                 Object? user = authSnapshot.data;
 
                 if (user == null) {
-                  return const SigninScreen();
+                  return const OnbordingScreen();
                 } else {
                   return const HomePage();
                 }

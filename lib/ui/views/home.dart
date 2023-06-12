@@ -24,7 +24,7 @@ class HomePage extends StatelessWidget {
 
   Stream<QuerySnapshot> getUser() {
     final String leander = AuthService().user.uid;
-    print(leander);
+    print("leander $leander");
     return FirestoreService().getCurrentUser(leander);
   }
 
@@ -35,13 +35,38 @@ class HomePage extends StatelessWidget {
             child: StreamBuilder<QuerySnapshot>(
           stream: stream,
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
+            if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
               final UserModel user = UserModel.fromJson(
                   snapshot.data!.docs.first.data() as Map<String, dynamic>);
               return Home(user: user);
             } else if (snapshot.hasError) {
               return const Center(
                 child: Text('Something went wrong'),
+              );
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.data!.docs.isEmpty) {
+              return Center(
+                child: Column(
+                  children: [
+                    const Text('No User Data found'),
+                    // logout button
+                    TextButton(
+                      onPressed: () {
+                        AuthService().signOut();
+
+                        // navigate to login page
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SigninScreen()));
+                      },
+                      child: Text('Logout'),
+                    ),
+                  ],
+                ),
               );
             } else {
               return const Center(

@@ -105,7 +105,7 @@ class _LoanState extends State<Loan> {
 
     return Container(
       margin: const EdgeInsets.all(15.0),
-      padding: const EdgeInsets.all(15.0),
+      // padding: const EdgeInsets.all(15.0),
       width: double.infinity,
       decoration: BoxDecoration(
         boxShadow: const [
@@ -120,37 +120,95 @@ class _LoanState extends State<Loan> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+//           #C78E07 100%
+// #E7B60B 100%
           colors: [
-            loan.isActive ? Colors.black87 : Colors.red.shade600,
-            loan.isActive ? Colors.black38 : Colors.red.shade200,
-            loan.isActive ? Colors.black87 : Colors.red.shade600,
+            loan.isActive ? const Color(0xFFC78E07) : Colors.red.shade600,
+            loan.isActive ? const Color(0xFFE7B60B) : Colors.red.shade200,
           ],
         ),
         borderRadius: BorderRadius.circular(10.0),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Header(
-                  title: formatAmount(loan.amount),
-                  fontSize: 30.0,
-                  color: Colors.white),
-              Header(
-                  title: loan.date.toIso8601String().split("T")[0],
-                  fontSize: 15.0,
-                  color: Colors.white),
-            ],
+          Positioned(
+            bottom: -80,
+            right: 20,
+            child: ClipRect(
+              child: Container(
+                margin: const EdgeInsets.all(15.0),
+                padding: const EdgeInsets.all(80.0),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      loan.isActive
+                          ? const Color(0xFFF7CF18).withOpacity(0.37)
+                          : Colors.red.shade600.withOpacity(0.37),
+                      loan.isActive
+                          ? const Color(0xFFE7B60B).withOpacity(0.37)
+                          : Colors.red.shade200.withOpacity(0.37),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(100.0),
+                ),
+              ),
+            ),
           ),
-          // const Header(
-          //     title: "₹ 1,00,000", fontSize: 30.0, color: Colors.white),
-          _loanDetailRow("Principal Left", formatAmount(principleLeft)),
-          _loanDetailRow("Intrest rate", "${loan.interestRate}%"),
-          _loanDetailRow("Collateral", loan.collateral),
-          _loanDetailRow("Intrest Amount", formatAmount(interest)),
+          Positioned(
+            top: -80,
+            left: -10,
+            child: ClipRect(
+              child: Container(
+                margin: const EdgeInsets.all(15.0),
+                padding: const EdgeInsets.all(80.0),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      loan.isActive
+                          ? const Color(0xFFF7CF18).withOpacity(0.67)
+                          : Colors.red.shade600.withOpacity(0.67),
+                      loan.isActive
+                          ? const Color(0xFFE7B60B).withOpacity(0.67)
+                          : Colors.red.shade200.withOpacity(0.67),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(100.0),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Header(
+                        title: formatAmount(loan.amount),
+                        fontSize: 30.0,
+                        color: Colors.white),
+                    Header(
+                        title: loan.date.toIso8601String().split("T")[0],
+                        fontSize: 15.0,
+                        color: Colors.white),
+                  ],
+                ),
+                // const Header(
+                //     title: "₹ 1,00,000", fontSize: 30.0, color: Colors.white),
+                _loanDetailRow("Principal Left", formatAmount(principleLeft)),
+                _loanDetailRow("Intrest rate", "${loan.interestRate}%"),
+                _loanDetailRow("Collateral", loan.collateral),
+                _loanDetailRow("Intrest Amount", formatAmount(interest)),
+              ],
+            ),
+          ),
         ],
       ),
     );

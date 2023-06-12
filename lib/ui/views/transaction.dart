@@ -135,7 +135,9 @@ class _TransactionState extends State<Transaction> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      totalIntrest = calculateTotalIntrest(widget.lastTransaction!);
+      if (widget.lastTransaction != null) {
+        totalIntrest = calculateTotalIntrest(widget.lastTransaction);
+      }
       List<TransactionModel> transactions = _calculateTransaction();
 
       FirestoreService().addTransaction(transactions).then((value) {
@@ -157,9 +159,9 @@ class _TransactionState extends State<Transaction> {
   }
 
   // calculate interest on last transactions
-  calculateTotalIntrest(List<TransactionModel> transactions) {
+  calculateTotalIntrest(List<TransactionModel>? transactions) {
     print(
-        'calculateTotalIntrest ${transactions.length}**************************************************');
+        'calculateTotalIntrest ${transactions!.length}**************************************************');
     for (var transaction in transactions) {
       totalIntrest += transaction.amount;
     }
@@ -242,6 +244,8 @@ class _TransactionState extends State<Transaction> {
         transactionType: _transactionType,
       ));
     } else {
+      // @TODO: Check for intrest due date and add the transaction to that month and then add in principal
+
       transactions.add(TransactionModel(
         id: '',
         amount: amount,

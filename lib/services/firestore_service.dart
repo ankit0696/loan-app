@@ -15,6 +15,7 @@ class FirestoreService {
   // get current user data
   Stream<QuerySnapshot> getCurrentUser(String uid) {
     try {
+      print('uid: $uid');
       return _db
           .collection(_userCollection)
           .where('id', isEqualTo: uid)
