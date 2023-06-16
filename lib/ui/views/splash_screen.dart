@@ -1,27 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:loan_app/ui/widgets/app_background.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-      body: Center(
-        child: Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFFF2C94C),
-                Color(0xFFE7C440),
-                Color(0xFFD9B136),
-                Color(0xFFC9940E),
-              ],
-            ),
-          ),
+    return AppBackground(
+      child: SafeArea(
+          child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -43,7 +32,7 @@ class SplashScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    ));
+      )),
+    );
   }
 }

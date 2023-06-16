@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:loan_app/ui/views/sign_in.dart';
+import 'package:loan_app/ui/views/bording_page.dart';
+import 'package:loan_app/ui/widgets/app_background.dart';
 import 'package:loan_app/ui/widgets/content_box.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -11,21 +12,8 @@ class BordingPageTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.maxFinite,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFF2C94C),
-              Color(0xFFE7C440),
-              Color(0xFFD9B136),
-              Color(0xFFC9940E),
-            ],
-          ),
-        ),
+      backgroundColor: Colors.transparent,
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -45,7 +33,7 @@ class BordingPageTwo extends StatelessWidget {
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const SigninScreen()),
+                        builder: (context) => const BordingPage()),
                     (route) => false);
               },
             ),
@@ -68,7 +56,7 @@ class BordingPageTwo extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                       color: const Color(0xFFA7A7A7).withOpacity(0.5),
                       borderRadius: BorderRadius.circular(30),
@@ -85,14 +73,14 @@ class BordingPageTwo extends StatelessWidget {
                           Icon(
                             Icons.arrow_back_ios,
                             color: Colors.white,
-                            size: 18,
+                            size: 15,
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: 4),
                           Text(
                             'Back',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -101,7 +89,7 @@ class BordingPageTwo extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                       color: const Color(0xFFA7A7A7).withOpacity(0.5),
                       borderRadius: BorderRadius.circular(30),
@@ -111,7 +99,7 @@ class BordingPageTwo extends StatelessWidget {
                         Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const SigninScreen()),
+                                builder: (context) => const BordingPage()),
                             (route) => false);
                       },
                       child: Row(
@@ -120,15 +108,15 @@ class BordingPageTwo extends StatelessWidget {
                             'Login',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(width: 8),
+                          SizedBox(width: 4),
                           Icon(
                             Icons.arrow_forward_ios,
                             color: Colors.white,
-                            size: 18,
+                            size: 15,
                           ),
                         ],
                       ),

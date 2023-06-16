@@ -4,7 +4,13 @@ class Header extends StatelessWidget {
   final String title;
   final double? fontSize;
   final Color? color;
-  const Header({super.key, required this.title, this.fontSize, this.color});
+  final FontWeight? fontWeight;
+  const Header(
+      {super.key,
+      required this.title,
+      this.fontSize,
+      this.color,
+      this.fontWeight});
 
   @override
   Widget build(BuildContext context) {
@@ -13,9 +19,9 @@ class Header extends StatelessWidget {
       child: Text(
         title,
         style: TextStyle(
-          fontSize: fontSize ?? 20.0,
-          color: color ?? const Color.fromARGB(255, 137, 136, 136),
-          fontWeight: FontWeight.w500,
+          fontSize: fontSize ?? 23.0,
+          color: color ?? const Color(0xFF505050),
+          fontWeight: fontWeight ?? FontWeight.bold,
         ),
       ),
     );

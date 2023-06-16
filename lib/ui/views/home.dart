@@ -9,6 +9,7 @@ import 'package:loan_app/ui/views/borrower_form.dart';
 import 'package:loan_app/ui/views/new_loan.dart';
 import 'package:loan_app/ui/views/sign_in.dart';
 import 'package:loan_app/ui/views/transaction.dart';
+import 'package:loan_app/ui/widgets/app_background.dart';
 import 'package:loan_app/ui/widgets/circular_avatar.dart';
 import 'package:loan_app/ui/widgets/header.dart';
 
@@ -17,7 +18,12 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: bodyWidget());
+    return AppBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: bodyWidget(),
+      ),
+    );
   }
 
   Stream<QuerySnapshot> get stream => getUser();
