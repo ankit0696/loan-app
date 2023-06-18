@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:loan_app/ui/views/sign_in.dart';
 import 'package:loan_app/ui/widgets/custom_snackbar.dart';
 
 class AuthService {
@@ -32,9 +34,14 @@ class AuthService {
   }
 
   // sign out
-  Future signOut() async {
+  Future signOut(BuildContext context) async {
     try {
-      return await _auth.signOut();
+      return await _auth.signOut().then((value) {
+        customSnackbar(message: "Logged out Successfully", context: context);
+        // navigate to login page
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const SigninScreen()));
+      });
     } catch (e) {
       print(e.toString());
       return null;

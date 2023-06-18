@@ -96,10 +96,15 @@ class _SigninScreenState extends State<SigninScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const CircularAvatar(
-                      imageUrl:
-                          "https://avatars.githubusercontent.com/u/61448739?v=4",
-                      radius: 80.0,
+                    // const CircularAvatar(
+                    //   imageUrl:
+                    //       "https://avatars.githubusercontent.com/u/61448739?v=4",
+                    //   radius: 80.0,
+                    // ),
+                    Image.asset(
+                      'assets/images/sign_up.png',
+                      // height: MediaQuery.of(context).size.height * 0.35,
+                      width: MediaQuery.of(context).size.width * 0.6,
                     ),
                     const SizedBox(height: 27.0),
                     const Header(title: "Loan App"),

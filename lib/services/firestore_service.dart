@@ -140,7 +140,7 @@ class FirestoreService {
           .snapshots();
     } catch (e) {
       print(e);
-      return Stream.empty();
+      return const Stream.empty();
     }
   }
 
@@ -157,6 +157,24 @@ class FirestoreService {
     } catch (e) {
       print(e);
       return Future.error(e);
+    }
+  }
+
+  Stream<QuerySnapshot<Object?>> getAllTransactions({int? limit}) {
+    // get only last 10 transactions
+    try {
+      Query query = _db
+          .collection(_transactionCollection)
+          .where('lenderId', isEqualTo: AuthService().user.uid)
+          .orderBy('createdDate', descending: true);
+
+      if (limit != null) {
+        query = query.limit(limit);
+      }
+      return query.snapshots();
+    } catch (e) {
+      print(e);
+      return const Stream.empty();
     }
   }
 

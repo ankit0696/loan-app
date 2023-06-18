@@ -1,16 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:loan_app/models/borrower.dart';
+import 'package:loan_app/models/transaction.dart';
 import 'package:loan_app/models/user.dart';
 import 'package:loan_app/services/auth_service.dart';
 import 'package:loan_app/services/firestore_service.dart';
+import 'package:loan_app/ui/shimmer_screens/home_shimmer.dart';
 import 'package:loan_app/ui/views/account.dart';
+import 'package:loan_app/ui/views/all_transactions.dart';
 import 'package:loan_app/ui/views/borrower_form.dart';
 import 'package:loan_app/ui/views/new_loan.dart';
 import 'package:loan_app/ui/views/sign_in.dart';
 import 'package:loan_app/ui/views/transaction.dart';
 import 'package:loan_app/ui/widgets/app_background.dart';
 import 'package:loan_app/ui/widgets/circular_avatar.dart';
+import 'package:loan_app/ui/widgets/formate_amount.dart';
 import 'package:loan_app/ui/widgets/header.dart';
 
 class HomePage extends StatelessWidget {
@@ -50,9 +54,10 @@ class HomePage extends StatelessWidget {
                 child: Text('Something went wrong'),
               );
             } else if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              // return const Center(
+              //   child: CircularProgressIndicator(),
+              // );
+              return const HomeShimmer();
             } else if (snapshot.data!.docs.isEmpty) {
               return Center(
                 child: Column(
@@ -61,15 +66,9 @@ class HomePage extends StatelessWidget {
                     // logout button
                     TextButton(
                       onPressed: () {
-                        AuthService().signOut();
-
-                        // navigate to login page
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SigninScreen()));
+                        AuthService().signOut(context);
                       },
-                      child: Text('Logout'),
+                      child: const Text('Logout'),
                     ),
                   ],
                 ),
@@ -101,6 +100,12 @@ Stream<QuerySnapshot> getBorrower() {
   return FirestoreService().getBorrowers(leander!);
 }
 
+Stream<QuerySnapshot> get streamTransaction => getTransactions();
+
+Stream<QuerySnapshot> getTransactions() {
+  return FirestoreService().getAllTransactions(limit: 10);
+}
+
 class _HomeState extends State<Home> {
   List<BorrowerModel> borrower = [];
 
@@ -114,21 +119,50 @@ class _HomeState extends State<Home> {
     return Builder(builder: (context) {
       return SafeArea(
         child: Scaffold(
-          backgroundColor: Colors.white,
-          floatingActionButton: _floatingActionButton(),
+          backgroundColor: Colors.transparent,
+          // floatingActionButton: _floatingActionButton(),
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _topNavBar(widget.user),
-              _spaceInBetween(),
-              _borrowerCard(),
-              _spaceInBetween(height: 20.0),
-              const Padding(
-                padding: EdgeInsets.only(left: 20.0),
-                child: Header(title: "Transactions"),
-              ),
               Expanded(
-                child: transactions(),
+                child: Container(
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _spaceInBetween(),
+                      _borrowerCard(),
+                      _spaceInBetween(height: 20.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Row(
+                          children: [
+                            const Header(title: "Transactions"),
+                            const Spacer(),
+                            //view all button
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const AllTransactions()));
+                              },
+                              child: const Header(
+                                title: "View All",
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: transactions(),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -141,12 +175,12 @@ class _HomeState extends State<Home> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
       width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(25.0),
           bottomRight: Radius.circular(25.0),
         ),
-        color: Colors.grey[400],
+        // color: Colors.grey[400],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -165,7 +199,7 @@ class _HomeState extends State<Home> {
                   Header(
                     title: user.name,
                     fontSize: 20.0,
-                    color: const Color.fromARGB(255, 137, 136, 136),
+                    color: Colors.white,
                   ),
                   const Header(
                       title: "Welcome Back!",
@@ -177,20 +211,20 @@ class _HomeState extends State<Home> {
           ),
           InkWell(
             onTap: () {
-              AuthService().signOut();
-
-              // navigate to login page
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SigninScreen()));
+              AuthService().signOut(context);
             },
             child: Container(
-              height: 50.0,
-              width: 50.0,
-              decoration: const BoxDecoration(
+              height: 40.0,
+              width: 40.0,
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Color.fromARGB(255, 137, 136, 136),
+                color: Colors.grey.withOpacity(0.43),
+                border: const Border.fromBorderSide(
+                  BorderSide(
+                    color: Colors.white,
+                    width: 1.0,
+                  ),
+                ),
               ),
               child: const Icon(
                 Icons.notifications,
@@ -316,34 +350,83 @@ class _HomeState extends State<Home> {
   }
 
   Widget transactions() {
-    return ListView.builder(
-      physics: const BouncingScrollPhysics(),
-      itemCount: 10,
-      itemBuilder: (context, index) {
-        return ListTile(
-          leading: const CircleAvatar(
-            backgroundImage: NetworkImage(
-                "https://avatars.githubusercontent.com/u/61448739?v=4"),
-          ),
-          title: const Text("Alina",
-              style: TextStyle(fontSize: 15, color: Colors.black)),
-          subtitle: const Text(
-            "Paid you 1000",
-            style: TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: const [
-              Text("10/10/2021",
-                  style: TextStyle(color: Colors.grey, fontSize: 12)),
-              Text("10:00 AM",
-                  style: TextStyle(color: Colors.grey, fontSize: 12)),
-            ],
-          ),
-        );
-      },
-    );
+    return StreamBuilder<QuerySnapshot>(
+        stream: streamTransaction,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(
+                child: Text("Something went wrong",
+                    style: TextStyle(color: Colors.red)));
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text("No Data Found"));
+          }
+
+          return ListView.builder(
+            physics: const BouncingScrollPhysics(),
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              TransactionModel transaction = TransactionModel.fromJson(
+                  snapshot.data!.docs[index].data() as Map<String, dynamic>);
+              return ListTile(
+                leading: const CircleAvatar(
+                  backgroundImage: NetworkImage(
+                      "https://avatars.githubusercontent.com/u/61448739?v=4"),
+                ),
+                title: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(formatAmount(transaction.amount),
+                            style: const TextStyle(
+                                fontSize: 15, color: Colors.black)),
+                        Container(
+                          margin: const EdgeInsets.only(left: 5.0),
+                          padding: const EdgeInsets.all(2.0),
+                          decoration: BoxDecoration(
+                            color: transaction.transactionType == "principal"
+                                ? Colors.green.shade200
+                                : Colors.blue.shade200,
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          child: Text(transaction.transactionType,
+                              style: const TextStyle(
+                                  fontSize: 10, color: Colors.black)),
+                        )
+                      ],
+                    ),
+                    Text(transaction.dueDate.toIso8601String().split("T")[0],
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey)),
+                  ],
+                ),
+                subtitle: Text(transaction.description ?? "",
+                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(transaction.date.toIso8601String().split("T")[0],
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text(
+                        transaction.date
+                            .toIso8601String()
+                            .split("T")[1]
+                            .split(".")[0],
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 12)),
+                  ],
+                ),
+              );
+            },
+          );
+        });
   }
 
   Widget _floatingActionButton() {
