@@ -6,7 +6,10 @@ import 'package:loan_app/models/loan.dart';
 import 'package:loan_app/services/firestore_service.dart';
 import 'package:loan_app/ui/views/loan_detail.dart';
 import 'package:loan_app/ui/views/new_loan.dart';
+import 'package:loan_app/ui/widgets/app_background.dart';
+import 'package:loan_app/ui/widgets/card_view.dart';
 import 'package:loan_app/ui/widgets/circular_avatar.dart';
+import 'package:loan_app/ui/widgets/custom_back_button.dart';
 import 'package:loan_app/ui/widgets/custom_snackbar.dart';
 import 'package:loan_app/ui/widgets/formate_amount.dart';
 import 'package:loan_app/ui/widgets/header.dart';
@@ -18,17 +21,12 @@ class AccountPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: BackButton(
-            color: Colors.black,
-            onPressed: () => Navigator.pop(context),
-          ),
-        ),
-        body: bodyWidget());
+    return AppBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: bodyWidget(),
+      ),
+    );
   }
 
   Stream<QuerySnapshot> get stream => getBorrower(borrowerId);
@@ -68,8 +66,11 @@ class Account extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child:
-            Scaffold(backgroundColor: Colors.white, body: bodyWidget(context)));
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF7CF18),
+        body: bodyWidget(context),
+      ),
+    );
   }
 
   Stream<QuerySnapshot> get stream => getLoans();
@@ -79,40 +80,108 @@ class Account extends StatelessWidget {
   }
 
   SingleChildScrollView bodyWidget(BuildContext context) {
+    final sizeHeight = MediaQuery.of(context).size.height * 0.15;
+
     return SingleChildScrollView(
       child: Center(
-        child: Column(
+        child: Stack(
+          alignment: Alignment.topCenter,
           children: [
-            const SizedBox(height: 20.0),
-            const CircularAvatar(
-              imageUrl: "https://avatars.githubusercontent.com/u/61448739?v=4",
-              radius: 80.0,
-            ),
-            const SizedBox(height: 20.0),
-            Header(title: borrower.name),
-            InkWell(
-              onTap: () {
-                Clipboard.setData(ClipboardData(text: borrower.phone));
-                customSnackbar(
-                    message: "Copied to Clipboard", context: context);
-              },
-              child: Header(
-                title: borrower.phone,
-                fontSize: 15,
+            background(context, sizeHeight),
+            Padding(
+              padding: EdgeInsets.only(top: sizeHeight),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  CustomBackButton(),
+                ],
               ),
             ),
-            const SizedBox(height: 20.0),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: extraDetails(context),
+            Column(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(top: sizeHeight / 2),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 5.0,
+                        ),
+                        borderRadius: BorderRadius.circular(100.0),
+                      ),
+                      child: const CircularAvatar(
+                        imageUrl:
+                            "https://avatars.githubusercontent.com/u/61448739?v=4",
+                        radius: 80.0,
+                      ),
+                    ),
+                    const SizedBox(height: 20.0),
+                    Header(
+                        title: borrower.name,
+                        fontSize: 16,
+                        color: Colors.white),
+                    InkWell(
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: borrower.phone));
+                        customSnackbar(
+                            message: "Copied to Clipboard", context: context);
+                      },
+                      child: Header(
+                        title: borrower.phone,
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  // padding: const EdgeInsets.symmetric(
+                  //     horizontal: 18.0, vertical: 10.0),
+                  margin: const EdgeInsets.only(top: 30.0),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30.0),
+                      topRight: Radius.circular(30.0),
+                    ),
+                    color: Colors.white,
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 18.0, vertical: 10.0),
+                        child: extraDetails(context),
+                      ),
+                      const SizedBox(height: 20.0),
+                      const Header(title: "Loans", fontSize: 20.0),
+                      _loans(context),
+                      // for (int i = 0; i < 10; i++) loanCard(context),
+                      _addNewLoan(context),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20.0),
-            const Header(title: "Loans", fontSize: 20.0),
-            _loans(context),
-            // for (int i = 0; i < 10; i++) loanCard(context),
-            _addNewLoan(context),
           ],
         ),
+      ),
+    );
+  }
+
+  Container background(BuildContext context, double sizeHeight) {
+    return Container(
+      margin: EdgeInsets.only(
+        top: sizeHeight,
+      ),
+      height: MediaQuery.of(context).size.height,
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30.0),
+          topRight: Radius.circular(30.0),
+        ),
+        color: Color(0xFFC78E07),
       ),
     );
   }
@@ -135,7 +204,7 @@ class Account extends StatelessWidget {
         label: "Address",
         hint: borrower.address,
         disabled: true,
-        icon: Icons.copy,
+        icon: Icons.location_on_outlined,
         onIconTap: () {
           Clipboard.setData(ClipboardData(text: borrower.address));
           customSnackbar(message: "Address copied", context: context);
@@ -186,149 +255,224 @@ class Account extends StatelessWidget {
         // padding: const EdgeInsets.all(15.0),
         width: double.infinity,
         height: 200,
-        decoration: BoxDecoration(
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.grey,
-              blurRadius: 5.0,
-              spreadRadius: 1.0,
-              offset: Offset(0.0, 0.0),
-            ),
-          ],
-          // color gradient
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              loan.isActive ? const Color(0xFFC78E07) : Colors.red.shade600,
-              loan.isActive ? const Color(0xFFE7B60B) : Colors.red.shade200,
-            ],
-          ),
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              bottom: -80,
-              right: 20,
-              child: ClipRect(
-                child: Container(
-                  margin: const EdgeInsets.all(15.0),
-                  padding: const EdgeInsets.all(80.0),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        loan.isActive
-                            ? const Color(0xFFF7CF18).withOpacity(0.37)
-                            : Colors.red.shade600.withOpacity(0.37),
-                        loan.isActive
-                            ? const Color(0xFFE7B60B).withOpacity(0.37)
-                            : Colors.red.shade200.withOpacity(0.37),
+        child: CustomCard(
+          isActive: loan.isActive,
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Header(
+                        title: formatAmount(loan.amount),
+                        fontSize: 30.0,
+                        color: Colors.white),
+                    Header(
+                        title: loan.date.toIso8601String().split("T")[0],
+                        fontSize: 15.0,
+                        color: Colors.white),
+                  ],
+                ),
+                // Header(
+                //     title: loan.amount.toString(),
+                //     fontSize: 15.0,
+                //     color: Colors.white),
+                const Spacer(),
+                Row(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Header(
+                            title: "Intrest rate",
+                            fontSize: 15.0,
+                            color: Colors.white),
+                        Header(
+                            title: "${loan.interestRate}%",
+                            fontSize: 14.0,
+                            color: Colors.white),
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(100.0),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: -80,
-              left: -10,
-              child: ClipRect(
-                child: Container(
-                  margin: const EdgeInsets.all(15.0),
-                  padding: const EdgeInsets.all(80.0),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        loan.isActive
-                            ? const Color(0xFFF7CF18).withOpacity(0.67)
-                            : Colors.red.shade600.withOpacity(0.67),
-                        loan.isActive
-                            ? const Color(0xFFE7B60B).withOpacity(0.67)
-                            : Colors.red.shade200.withOpacity(0.67),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(100.0),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Header(
-                          title: formatAmount(loan.amount),
-                          fontSize: 30.0,
-                          color: Colors.white),
-                      Header(
-                          title: loan.date.toIso8601String().split("T")[0],
-                          fontSize: 15.0,
-                          color: Colors.white),
-                    ],
-                  ),
-                  // Header(
-                  //     title: loan.amount.toString(),
-                  //     fontSize: 15.0,
-                  //     color: Colors.white),
-                  const Spacer(),
-                  Row(
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.all(5.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child: Row(
                         children: [
-                          const Header(
-                              title: "Intrest rate",
-                              fontSize: 15.0,
-                              color: Colors.white),
+                          Icon(
+                            loan.isActive ? Icons.check_circle : Icons.close,
+                            color: loan.isActive ? Colors.green : Colors.black,
+                          ),
                           Header(
-                              title: "${loan.interestRate}%",
+                              title: loan.isActive ? "Active" : "Done",
                               fontSize: 14.0,
-                              color: Colors.white),
+                              color:
+                                  loan.isActive ? Colors.green : Colors.black),
                         ],
                       ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.all(5.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              loan.isActive ? Icons.check_circle : Icons.close,
-                              color:
-                                  loan.isActive ? Colors.green : Colors.black,
-                            ),
-                            Header(
-                                title: loan.isActive ? "Active" : "Done",
-                                fontSize: 14.0,
-                                color: loan.isActive
-                                    ? Colors.green
-                                    : Colors.black),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
+      // child: Container(
+      //   margin: const EdgeInsets.all(15.0),
+      //   // padding: const EdgeInsets.all(15.0),
+      //   width: double.infinity,
+      //   height: 200,
+      //   decoration: BoxDecoration(
+      //     boxShadow: const [
+      //       BoxShadow(
+      //         color: Colors.grey,
+      //         blurRadius: 5.0,
+      //         spreadRadius: 1.0,
+      //         offset: Offset(0.0, 0.0),
+      //       ),
+      //     ],
+      //     // color gradient
+      //     gradient: LinearGradient(
+      //       begin: Alignment.topLeft,
+      //       end: Alignment.bottomRight,
+      //       colors: [
+      //         loan.isActive ? const Color(0xFFC78E07) : Colors.red.shade600,
+      //         loan.isActive ? const Color(0xFFE7B60B) : Colors.red.shade200,
+      //       ],
+      //     ),
+      //     borderRadius: BorderRadius.circular(10.0),
+      //   ),
+      //   child: Stack(
+      //     children: [
+      //       Positioned(
+      //         bottom: -80,
+      //         right: 20,
+      //         child: ClipRect(
+      //           child: Container(
+      //             margin: const EdgeInsets.all(15.0),
+      //             padding: const EdgeInsets.all(80.0),
+      //             decoration: BoxDecoration(
+      //               gradient: LinearGradient(
+      //                 begin: Alignment.topLeft,
+      //                 end: Alignment.bottomRight,
+      //                 colors: [
+      //                   loan.isActive
+      //                       ? const Color(0xFFF7CF18).withOpacity(0.37)
+      //                       : Colors.red.shade600.withOpacity(0.37),
+      //                   loan.isActive
+      //                       ? const Color(0xFFE7B60B).withOpacity(0.37)
+      //                       : Colors.red.shade200.withOpacity(0.37),
+      //                 ],
+      //               ),
+      //               borderRadius: BorderRadius.circular(100.0),
+      //             ),
+      //           ),
+      //         ),
+      //       ),
+      //       Positioned(
+      //         top: -80,
+      //         left: -10,
+      //         child: ClipRect(
+      //           child: Container(
+      //             margin: const EdgeInsets.all(15.0),
+      //             padding: const EdgeInsets.all(80.0),
+      //             decoration: BoxDecoration(
+      //               gradient: LinearGradient(
+      //                 begin: Alignment.topLeft,
+      //                 end: Alignment.bottomRight,
+      //                 colors: [
+      //                   loan.isActive
+      //                       ? const Color(0xFFF7CF18).withOpacity(0.67)
+      //                       : Colors.red.shade600.withOpacity(0.67),
+      //                   loan.isActive
+      //                       ? const Color(0xFFE7B60B).withOpacity(0.67)
+      //                       : Colors.red.shade200.withOpacity(0.67),
+      //                 ],
+      //               ),
+      //               borderRadius: BorderRadius.circular(100.0),
+      //             ),
+      //           ),
+      //         ),
+      //       ),
+      //       Padding(
+      //         padding: const EdgeInsets.all(15.0),
+      //         child: Column(
+      //           mainAxisAlignment: MainAxisAlignment.start,
+      //           crossAxisAlignment: CrossAxisAlignment.start,
+      //           children: [
+      //             Row(
+      //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //               children: [
+      //                 Header(
+      //                     title: formatAmount(loan.amount),
+      //                     fontSize: 30.0,
+      //                     color: Colors.white),
+      //                 Header(
+      //                     title: loan.date.toIso8601String().split("T")[0],
+      //                     fontSize: 15.0,
+      //                     color: Colors.white),
+      //               ],
+      //             ),
+      //             // Header(
+      //             //     title: loan.amount.toString(),
+      //             //     fontSize: 15.0,
+      //             //     color: Colors.white),
+      //             const Spacer(),
+      //             Row(
+      //               children: [
+      //                 Column(
+      //                   mainAxisAlignment: MainAxisAlignment.start,
+      //                   crossAxisAlignment: CrossAxisAlignment.start,
+      //                   children: [
+      //                     const Header(
+      //                         title: "Intrest rate",
+      //                         fontSize: 15.0,
+      //                         color: Colors.white),
+      //                     Header(
+      //                         title: "${loan.interestRate}%",
+      //                         fontSize: 14.0,
+      //                         color: Colors.white),
+      //                   ],
+      //                 ),
+      //                 const Spacer(),
+      //                 Container(
+      //                   padding: const EdgeInsets.all(5.0),
+      //                   decoration: BoxDecoration(
+      //                     color: Colors.white.withOpacity(0.5),
+      //                     borderRadius: BorderRadius.circular(20.0),
+      //                   ),
+      //                   child: Row(
+      //                     children: [
+      //                       Icon(
+      //                         loan.isActive ? Icons.check_circle : Icons.close,
+      //                         color:
+      //                             loan.isActive ? Colors.green : Colors.black,
+      //                       ),
+      //                       Header(
+      //                           title: loan.isActive ? "Active" : "Done",
+      //                           fontSize: 14.0,
+      //                           color: loan.isActive
+      //                               ? Colors.green
+      //                               : Colors.black),
+      //                     ],
+      //                   ),
+      //                 ),
+      //               ],
+      //             ),
+      //           ],
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 

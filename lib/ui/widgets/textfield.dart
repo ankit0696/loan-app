@@ -19,6 +19,7 @@ Widget textField(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       label != null ? Header(title: label, fontSize: 15.0) : const SizedBox(),
+      const SizedBox(height: 10.0),
       Container(
         margin: const EdgeInsets.symmetric(vertical: 5.0),
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
