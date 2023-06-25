@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:loan_app/models/loan.dart';
 import 'package:loan_app/models/transaction.dart';
 import 'package:loan_app/services/firestore_service.dart';
+import 'package:loan_app/ui/widgets/custom_back_button.dart';
+import 'package:loan_app/ui/widgets/custom_button.dart';
 import 'package:loan_app/ui/widgets/custom_snackbar.dart';
+import 'package:loan_app/ui/widgets/header.dart';
 import 'package:loan_app/ui/widgets/textfield.dart';
 import 'package:intl/intl.dart';
 
@@ -266,96 +269,187 @@ class _TransactionState extends State<Transaction> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Transaction'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Amount',
+    final sizeHeight = MediaQuery.of(context).size.height * 0.15;
+
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF7CF18),
+        body: SingleChildScrollView(
+          child: Center(
+            child: Stack(
+              children: [
+                background(context, sizeHeight),
+                Padding(
+                  padding: EdgeInsets.only(top: sizeHeight),
+                  child: Row(
+                    children: const [
+                      CustomBackButton(),
+                      Header(
+                          title: "New Loan", fontSize: 20, color: Colors.white),
+                    ],
+                  ),
                 ),
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an amount';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              textField(
-                controller: _dateController,
-                hint: 'Enter your date of birth',
-                icon: Icons.calendar_today,
-                keyboardType: TextInputType.datetime,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a date';
-                  }
-                  final date = DateTime.tryParse(value);
-                  if (date == null) {
-                    return 'Please enter a valid date';
-                  }
-                  return null;
-                },
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) {
-                    _dateController.text =
-                        DateFormat('yyyy-MM-dd').format(date);
-                  }
-                },
-              ),
-              DropdownButtonFormField<String>(
-                value: _transactionType,
-                onChanged: (newValue) {
-                  setState(() {
-                    _transactionType = newValue!;
-                  });
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Transaction Type',
+                Column(
+                  children: [
+                    Column(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(top: sizeHeight / 2),
+                          child: const SizedBox(
+                            height: 100,
+                            width: 100,
+                          ),
+                        ),
+                        const SizedBox(height: 20.0),
+                      ],
+                    ),
+                    Container(
+                      height: MediaQuery.of(context).size.height,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 20.0),
+                      margin: const EdgeInsets.only(top: 30.0),
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30.0),
+                          topRight: Radius.circular(30.0),
+                        ),
+                        color: Colors.white,
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // TextFormField(
+                            //   controller: _amountController,
+                            //   decoration: const InputDecoration(
+                            //     labelText: 'Amount',
+                            //   ),
+                            //   keyboardType:
+                            //       const TextInputType.numberWithOptions(
+                            //           decimal: true),
+                            //   validator: (value) {
+                            //     if (value == null || value.isEmpty) {
+                            //       return 'Please enter an amount';
+                            //     }
+                            //     if (double.tryParse(value) == null) {
+                            //       return 'Please enter a valid number';
+                            //     }
+                            //     return null;
+                            //   },
+                            // ),
+                            textField(
+                              controller: _amountController,
+                              label: "Amount",
+                              hint: "Enter Amount",
+                              icon: Icons.money,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter an amount';
+                                }
+                                if (double.tryParse(value) == null) {
+                                  return 'Please enter a valid number';
+                                }
+                                return null;
+                              },
+                            ),
+                            textField(
+                              controller: _dateController,
+                              hint: 'Enter your date of birth',
+                              icon: Icons.calendar_today,
+                              keyboardType: TextInputType.datetime,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a date';
+                                }
+                                final date = DateTime.tryParse(value);
+                                if (date == null) {
+                                  return 'Please enter a valid date';
+                                }
+                                return null;
+                              },
+                              onTap: () async {
+                                final date = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime.now(),
+                                );
+                                if (date != null) {
+                                  _dateController.text =
+                                      DateFormat('yyyy-MM-dd').format(date);
+                                }
+                              },
+                            ),
+                            DropdownButtonFormField<String>(
+                              value: _transactionType,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  _transactionType = newValue!;
+                                });
+                              },
+                              decoration: const InputDecoration(
+                                labelText: 'Transaction Type',
+                              ),
+                              items: <String>[
+                                'interest',
+                                'principal',
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value.toUpperCase()),
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 16.0),
+                            // TextFormField(
+                            //   controller: _descriptionController,
+                            //   decoration: const InputDecoration(
+                            //     labelText: 'Description (optional)',
+                            //   ),
+                            // ),
+                            textField(
+                              controller: _descriptionController,
+                              hint: "Description (optional)",
+                              icon: Icons.description,
+                              label: "Description (optional)",
+                            ),
+                            const SizedBox(height: 16.0),
+                            CustomButton(
+                                onPressed: _submitForm, buttonText: "Add Loan")
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                items: <String>[
-                  'interest',
-                  'principal',
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value.toUpperCase()),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description (optional)',
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: _submitForm,
+        //   child: const Icon(Icons.check),
+        // ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _submitForm,
-        child: const Icon(Icons.check),
+    );
+  }
+
+  Container background(BuildContext context, double sizeHeight) {
+    return Container(
+      margin: EdgeInsets.only(
+        top: sizeHeight,
+      ),
+      height: MediaQuery.of(context).size.height,
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30.0),
+          topRight: Radius.circular(30.0),
+        ),
+        color: Color(0xFFC78E07),
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:loan_app/services/firestore_service.dart';
 import 'package:loan_app/ui/views/transaction.dart';
 import 'package:loan_app/ui/widgets/card_view.dart';
 import 'package:loan_app/ui/widgets/custom_back_button.dart';
+import 'package:loan_app/ui/widgets/custom_button.dart';
 import 'package:loan_app/ui/widgets/formate_amount.dart';
 import 'package:loan_app/ui/widgets/header.dart';
 
@@ -18,16 +19,7 @@ class LoanDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color(0xFFF7CF18),
-        // appBar: AppBar(
-        //   backgroundColor: Colors.transparent,
-        //   elevation: 0,
-        //   leading: BackButton(
-        //     color: Colors.black,
-        //     onPressed: () => Navigator.pop(context),
-        //   ),
-        // ),
-        body: bodyWidget());
+        backgroundColor: const Color(0xFFF7CF18), body: bodyWidget());
   }
 
   Stream<QuerySnapshot> get stream => getLoan(borrowerId, loanId);
@@ -72,9 +64,23 @@ class _LoanState extends State<Loan> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-      floatingActionButton: _floatingActionButton(),
+      // floatingActionButton: _floatingActionButton(),
+      floatingActionButton: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: CustomButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => TransactionForm(loan: widget.loan)));
+          },
+          buttonText: "Add transaction",
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       backgroundColor: const Color(0xFFF7CF18),
       body: bodyWidget(),
+      // make a button to add new transaction which is alway visible
     ));
   }
 
@@ -154,113 +160,6 @@ class _LoanState extends State<Loan> {
         ),
       ),
     );
-    // return Container(
-    //   margin: const EdgeInsets.only(bottom: 15.0),
-    //   // padding: const EdgeInsets.all(15.0),
-    //   width: double.infinity,
-    //   decoration: BoxDecoration(
-    //     boxShadow: const [
-    //       BoxShadow(
-    //         color: Colors.grey,
-    //         blurRadius: 5.0,
-    //         spreadRadius: 1.0,
-    //         offset: Offset(0.0, 0.0),
-    //       ),
-    //     ],
-    //     // color gradient
-    //     gradient: LinearGradient(
-    //       begin: Alignment.topLeft,
-    //       end: Alignment.bottomRight,
-    //       colors: [
-    //         loan.isActive ? const Color(0xFFC78E07) : Colors.red.shade600,
-    //         loan.isActive ? const Color(0xFFE7B60B) : Colors.red.shade200,
-    //       ],
-    //     ),
-    //     borderRadius: BorderRadius.circular(10.0),
-    //   ),
-    //   child: Stack(
-    //     children: [
-    //       Positioned(
-    //         bottom: -80,
-    //         right: 20,
-    //         child: ClipRect(
-    //           child: Container(
-    //             margin: const EdgeInsets.all(15.0),
-    //             padding: const EdgeInsets.all(80.0),
-    //             decoration: BoxDecoration(
-    //               gradient: LinearGradient(
-    //                 begin: Alignment.topLeft,
-    //                 end: Alignment.bottomRight,
-    //                 colors: [
-    //                   loan.isActive
-    //                       ? const Color(0xFFF7CF18).withOpacity(0.37)
-    //                       : Colors.red.shade600.withOpacity(0.37),
-    //                   loan.isActive
-    //                       ? const Color(0xFFE7B60B).withOpacity(0.37)
-    //                       : Colors.red.shade200.withOpacity(0.37),
-    //                 ],
-    //               ),
-    //               borderRadius: BorderRadius.circular(100.0),
-    //             ),
-    //           ),
-    //         ),
-    //       ),
-    //       Positioned(
-    //         top: -80,
-    //         left: -10,
-    //         child: ClipRect(
-    //           child: Container(
-    //             margin: const EdgeInsets.all(15.0),
-    //             padding: const EdgeInsets.all(80.0),
-    //             decoration: BoxDecoration(
-    //               gradient: LinearGradient(
-    //                 begin: Alignment.topLeft,
-    //                 end: Alignment.bottomRight,
-    //                 colors: [
-    //                   loan.isActive
-    //                       ? const Color(0xFFF7CF18).withOpacity(0.67)
-    //                       : Colors.red.shade600.withOpacity(0.67),
-    //                   loan.isActive
-    //                       ? const Color(0xFFE7B60B).withOpacity(0.67)
-    //                       : Colors.red.shade200.withOpacity(0.67),
-    //                 ],
-    //               ),
-    //               borderRadius: BorderRadius.circular(100.0),
-    //             ),
-    //           ),
-    //         ),
-    //       ),
-    //       Padding(
-    //         padding: const EdgeInsets.all(15.0),
-    //         child: Column(
-    //           mainAxisAlignment: MainAxisAlignment.start,
-    //           crossAxisAlignment: CrossAxisAlignment.start,
-    //           children: [
-    //             Row(
-    //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //               children: [
-    //                 Header(
-    //                     title: formatAmount(loan.amount),
-    //                     fontSize: 30.0,
-    //                     color: Colors.white),
-    //                 Header(
-    //                     title: loan.date.toIso8601String().split("T")[0],
-    //                     fontSize: 15.0,
-    //                     color: Colors.white),
-    //               ],
-    //             ),
-    //             // const Header(
-    //             //     title: "₹ 1,00,000", fontSize: 30.0, color: Colors.white),
-    //             _loanDetailRow("Principal Left", formatAmount(principleLeft)),
-    //             _loanDetailRow("Intrest rate", "${loan.interestRate}%"),
-    //             _loanDetailRow("Collateral", loan.collateral),
-    //             _loanDetailRow("Intrest Amount", formatAmount(interest)),
-    //           ],
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    // );
   }
 
   Widget _transactions() {
@@ -278,43 +177,6 @@ class _LoanState extends State<Loan> {
           if (snapshot.data!.docs.isEmpty) {
             return const Center(child: Text("No Data Found"));
           }
-          // return ListView.builder(
-          //   physics: const BouncingScrollPhysics(),
-          //   itemCount: snapshot.data!.docs.length,
-          //   itemBuilder: (context, index) {
-          //     return Center(
-          //       child: Text(
-          //         snapshot.data!.docs[index].data().toString(),
-          //       ),
-          //     );
-          //   },
-          // );
-          // return ListView.builder(
-          //   physics: const BouncingScrollPhysics(),
-          //   itemCount: snapshot.data!.docs.length,
-          //   itemBuilder: (context, index) {
-          //     return ListTile(
-          //       leading: const CircleAvatar(
-          //         backgroundImage: NetworkImage(
-          //             "https://avatars.githubusercontent.com/u/61448739?v=4"),
-          //       ),
-          //       title: const Text("Alina",
-          //           style: TextStyle(fontSize: 15, color: Colors.black)),
-          //       subtitle: const Text("Paid you 1000",
-          //           style: TextStyle(fontSize: 12, color: Colors.grey)),
-          //       trailing: Column(
-          //         mainAxisAlignment: MainAxisAlignment.center,
-          //         crossAxisAlignment: CrossAxisAlignment.end,
-          //         children: const [
-          //           Text("10/10/2021",
-          //               style: TextStyle(color: Colors.grey, fontSize: 12)),
-          //           Text("10:00 AM",
-          //               style: TextStyle(color: Colors.grey, fontSize: 12)),
-          //         ],
-          //       ),
-          //     );
-          //   },
-          // );
 
           return ListView.builder(
             physics: const BouncingScrollPhysics(),

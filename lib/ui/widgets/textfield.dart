@@ -30,17 +30,14 @@ Widget textField(
             color: const Color(0xFF9F6609),
             width: 1.0,
           ),
-          color: Colors.grey[200],
+          color: const Color(0x19FFC107),
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Row(
           children: [
             Expanded(
               child: TextFormField(
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 15.0,
-                ),
+                style: const TextStyle(color: Colors.black, fontSize: 15.0),
                 onTap: onTap ?? () {},
                 validator: validator ??
                     (value) {
@@ -52,20 +49,15 @@ Widget textField(
                 controller: controller,
                 decoration: InputDecoration(
                   hintText: hint,
-                  hintStyle: const TextStyle(
-                    color: Color(0xFFB5AFAF),
-                    fontSize: 15.0,
-                  ),
+                  hintStyle:
+                      const TextStyle(color: Color(0xFFB5AFAF), fontSize: 15.0),
                   border: InputBorder.none,
                 ),
               ),
             ),
             InkWell(
               onTap: onIconTap ?? () {},
-              child: Icon(
-                icon,
-                color: const Color(0xFF646363),
-              ),
+              child: Icon(icon, color: const Color(0xFF646363)),
             ),
           ],
         ),
