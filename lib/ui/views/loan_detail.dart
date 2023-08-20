@@ -104,15 +104,15 @@ class _LoanState extends State<Loan> {
       ),
       child: Column(
         children: [
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               CustomBackButton(),
             ],
           ),
           _loanCard(widget.loan),
-          Row(
-            children: const [
+          const Row(
+            children: [
               Header(title: "Transactions"),
             ],
           ),

@@ -9,6 +9,7 @@ import 'package:loan_app/ui/shimmer_screens/home_shimmer.dart';
 import 'package:loan_app/ui/views/account.dart';
 import 'package:loan_app/ui/views/all_transactions.dart';
 import 'package:loan_app/ui/views/borrower_form.dart';
+import 'package:loan_app/ui/views/profile_page.dart';
 import 'package:loan_app/ui/widgets/app_background.dart';
 import 'package:loan_app/ui/widgets/circular_avatar.dart';
 import 'package:loan_app/ui/widgets/formate_amount.dart';
@@ -184,10 +185,18 @@ class _HomeState extends State<Home> {
         children: [
           Row(
             children: [
-              const CircularAvatar(
-                imageUrl:
-                    "https://avatars.githubusercontent.com/u/61448739?v=4",
-                radius: 60.0,
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ProfilePage()));
+                },
+                child: const CircularAvatar(
+                  imageUrl:
+                      "https://avatars.githubusercontent.com/u/61448739?v=4",
+                  radius: 60.0,
+                ),
               ),
               const SizedBox(width: 20.0),
               Column(

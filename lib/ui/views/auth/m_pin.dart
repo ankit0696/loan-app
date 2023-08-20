@@ -3,6 +3,7 @@ import 'package:loan_app/services/firestore_service.dart';
 import 'package:loan_app/ui/views/home.dart';
 import 'package:loan_app/ui/widgets/app_background.dart';
 import 'package:loan_app/ui/widgets/custom_button.dart';
+import 'package:loan_app/ui/widgets/custom_snackbar.dart';
 
 class MPINScreen extends StatefulWidget {
   const MPINScreen({super.key});
@@ -41,6 +42,7 @@ class _MPINScreenState extends State<MPINScreen> {
                         ),
                         child: Center(
                           child: TextFormField(
+                            autofocus: i == 0 ? true : false,
                             cursorColor: Colors.black,
                             controller: _digitControllers[i],
                             obscureText: true,
@@ -111,6 +113,7 @@ class _MPINScreenState extends State<MPINScreen> {
           setState(() {
             _verificationStatus = result;
           });
+          // ignore: use_build_context_synchronously
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => const HomePage()));
         } else {
@@ -119,8 +122,21 @@ class _MPINScreenState extends State<MPINScreen> {
           });
         }
       }
+      // ignore: use_build_context_synchronously
+      customSnackbar(message: _verificationStatus, context: context);
+
+      // clear all text fields
+      for (var controller in _digitControllers) {
+        controller.clear();
+      }
     } catch (e) {
-      print(e);
+      // ignore: use_build_context_synchronously
+      customSnackbar(message: e.toString(), context: context);
+
+      // clear all text fields
+      for (var controller in _digitControllers) {
+        controller.clear();
+      }
     }
   }
 
@@ -131,6 +147,7 @@ class _MPINScreenState extends State<MPINScreen> {
           .then((value) => value);
     } catch (e) {
       print(e);
+      customSnackbar(message: e.toString(), context: context);
       return '';
     }
   }

@@ -282,8 +282,8 @@ class _TransactionState extends State<Transaction> {
                 background(context, sizeHeight),
                 Padding(
                   padding: EdgeInsets.only(top: sizeHeight),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       CustomBackButton(),
                       Header(
                           title: "New Loan", fontSize: 20, color: Colors.white),
@@ -305,7 +305,7 @@ class _TransactionState extends State<Transaction> {
                       ],
                     ),
                     Container(
-                      height: MediaQuery.of(context).size.height,
+                      height: MediaQuery.of(context).size.height * 0.73,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20.0, vertical: 20.0),
                       margin: const EdgeInsets.only(top: 30.0),
@@ -418,9 +418,10 @@ class _TransactionState extends State<Transaction> {
                               icon: Icons.description,
                               label: "Description (optional)",
                             ),
-                            const SizedBox(height: 16.0),
+                            const Spacer(),
                             CustomButton(
-                                onPressed: _submitForm, buttonText: "Add Loan")
+                                onPressed: _submitForm, buttonText: "Add Loan"),
+                            const SizedBox(height: 16.0),
                           ],
                         ),
                       ),
@@ -444,7 +445,7 @@ class _TransactionState extends State<Transaction> {
       margin: EdgeInsets.only(
         top: sizeHeight,
       ),
-      height: MediaQuery.of(context).size.height,
+      height: MediaQuery.of(context).size.height * 0.7,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30.0),

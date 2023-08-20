@@ -90,9 +90,9 @@ class Account extends StatelessWidget {
             background(context, sizeHeight),
             Padding(
               padding: EdgeInsets.only(top: sizeHeight),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   CustomBackButton(),
                 ],
               ),
@@ -118,9 +118,10 @@ class Account extends StatelessWidget {
                     ),
                     const SizedBox(height: 20.0),
                     Header(
-                        title: borrower.name,
-                        fontSize: 16,
-                        color: Colors.white),
+                      title: borrower.name,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
                     InkWell(
                       onTap: () {
                         Clipboard.setData(ClipboardData(text: borrower.phone));
@@ -136,8 +137,6 @@ class Account extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  // padding: const EdgeInsets.symmetric(
-                  //     horizontal: 18.0, vertical: 10.0),
                   margin: const EdgeInsets.only(top: 30.0),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(
@@ -149,16 +148,14 @@ class Account extends StatelessWidget {
                   child: Column(
                     children: [
                       const SizedBox(height: 20.0),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 18.0, vertical: 10.0),
-                        child: extraDetails(context),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.90,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18.0, vertical: 10.0),
+                          child: extraDetails(context),
+                        ),
                       ),
-                      const SizedBox(height: 20.0),
-                      const Header(title: "Loans", fontSize: 20.0),
-                      _loans(context),
-                      // for (int i = 0; i < 10; i++) loanCard(context),
-                      _addNewLoan(context),
                     ],
                   ),
                 ),
@@ -175,7 +172,7 @@ class Account extends StatelessWidget {
       margin: EdgeInsets.only(
         top: sizeHeight,
       ),
-      height: MediaQuery.of(context).size.height,
+      height: MediaQuery.of(context).size.height * 0.70,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30.0),
@@ -210,7 +207,12 @@ class Account extends StatelessWidget {
           customSnackbar(message: "Address copied", context: context);
         },
       ),
-      const SizedBox(height: 10.0),
+      const SizedBox(height: 30.0),
+      const Header(title: "Loans", fontSize: 20.0),
+      Expanded(
+        child: _loans(context),
+      ),
+      // for (int i = 0; i < 10; i++) loanCard(context),
     ]);
   }
 
@@ -229,12 +231,17 @@ class Account extends StatelessWidget {
         }
         return ListView.builder(
           shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: snapshot.data!.docs.length,
+          physics: const BouncingScrollPhysics(),
+          itemCount: snapshot.data!.docs.length + 1,
           itemBuilder: (context, index) {
-            LoanModel loan = LoanModel.fromJson(
-                snapshot.data!.docs[index].data() as Map<String, dynamic>);
-            return loanCard(context, loan);
+            if (index == snapshot.data!.docs.length) {
+              return _addNewLoan(context);
+            } else {
+              LoanModel loan = LoanModel.fromJson(
+                  snapshot.data!.docs[index].data() as Map<String, dynamic>);
+
+              return loanCard(context, loan);
+            }
           },
         );
       },

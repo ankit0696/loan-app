@@ -128,7 +128,7 @@ class _BorrowFormState extends State<BorrowForm> {
                           ],
                         ),
                         Container(
-                          height: MediaQuery.of(context).size.height,
+                          height: MediaQuery.of(context).size.height * 0.75,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20.0, vertical: 20.0),
                           margin: const EdgeInsets.only(top: 30.0),
@@ -237,11 +237,15 @@ class _BorrowFormState extends State<BorrowForm> {
                                 //         : const Text('Submit'),
                                 //   ),
                                 // ),
+                                const Spacer(),
                                 _loading
                                     ? const CircularProgressIndicator()
                                     : CustomButton(
                                         onPressed: _handleSubmit,
-                                        buttonText: "Submit")
+                                        buttonText: "Submit",
+                                      ),
+
+                                const SizedBox(height: 20.0),
                               ],
                             ),
                           ),
@@ -259,7 +263,7 @@ class _BorrowFormState extends State<BorrowForm> {
       margin: EdgeInsets.only(
         top: sizeHeight,
       ),
-      height: MediaQuery.of(context).size.height,
+      height: MediaQuery.of(context).size.height * 0.7,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30.0),

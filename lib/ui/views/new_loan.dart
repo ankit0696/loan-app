@@ -109,8 +109,8 @@ class _LoanFormState extends State<LoanForm> {
                 background(context, sizeHeight),
                 Padding(
                   padding: EdgeInsets.only(top: sizeHeight),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       CustomBackButton(),
                       Header(
                           title: "New Loan", fontSize: 20, color: Colors.white),
@@ -132,7 +132,7 @@ class _LoanFormState extends State<LoanForm> {
                       ],
                     ),
                     Container(
-                      height: MediaQuery.of(context).size.height,
+                      height: MediaQuery.of(context).size.height * 0.7,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20.0, vertical: 20.0),
                       margin: const EdgeInsets.only(top: 30.0),
@@ -262,7 +262,7 @@ class _LoanFormState extends State<LoanForm> {
       margin: EdgeInsets.only(
         top: sizeHeight,
       ),
-      height: MediaQuery.of(context).size.height,
+      height: MediaQuery.of(context).size.height * 0.7,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30.0),

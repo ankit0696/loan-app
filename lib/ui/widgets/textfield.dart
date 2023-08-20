@@ -50,8 +50,7 @@ Widget textField(
                 decoration: InputDecoration(
                   hintText: hint,
                   hintStyle: const TextStyle(
-                      color: Color.fromARGB(255, 254, 254, 254),
-                      fontSize: 15.0),
+                      color: Color.fromARGB(255, 0, 0, 0), fontSize: 15.0),
                   border: InputBorder.none,
                 ),
               ),

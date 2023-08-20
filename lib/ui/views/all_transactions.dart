@@ -2,7 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:loan_app/models/transaction.dart';
 import 'package:loan_app/services/firestore_service.dart';
+import 'package:loan_app/ui/widgets/app_background.dart';
+import 'package:loan_app/ui/widgets/circular_avatar.dart';
+import 'package:loan_app/ui/widgets/custom_back_button.dart';
 import 'package:loan_app/ui/widgets/formate_amount.dart';
+import 'package:loan_app/ui/widgets/header.dart';
 
 class AllTransactions extends StatefulWidget {
   const AllTransactions({super.key});
@@ -20,20 +24,83 @@ Stream<QuerySnapshot> getTransactions() {
 class _AllTransactionsState extends State<AllTransactions> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-      appBar: AppBar(
-        title: const Text("All Transactions"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+    return AppBackground(
+      child: SafeArea(
+          child: Scaffold(
+        backgroundColor: Colors.transparent,
+        // appBar: AppBar(
+        //   title: const Text("All Transactions"),
+        // ),
+        body: bodyWidget(),
+      )),
+    );
+  }
+
+  Center bodyWidget() {
+    final sizeHeight = MediaQuery.of(context).size.height * 0.15;
+
+    return Center(
+      child: SingleChildScrollView(
+        child: Stack(
           children: [
-            Expanded(child: transactions()),
+            background(context, sizeHeight),
+            Padding(
+              padding: EdgeInsets.only(top: sizeHeight),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomBackButton(),
+                ],
+              ),
+            ),
+            Column(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(top: sizeHeight / 2),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.transparent,
+                          width: 5.0,
+                        ),
+                        borderRadius: BorderRadius.circular(100.0),
+                      ),
+                      child: const SizedBox(height: 80),
+                    ),
+                    // const SizedBox(height: 20.0),
+                    const Header(
+                      title: "All Transactions", //widget.user.name,
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 30.0),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30.0),
+                      topRight: Radius.circular(30.0),
+                    ),
+                    color: Colors.white,
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20.0),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.80,
+                        child: transactions(),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ],
         ),
       ),
-    ));
+    );
   }
 
   Widget transactions() {
@@ -114,5 +181,21 @@ class _AllTransactionsState extends State<AllTransactions> {
             },
           );
         });
+  }
+
+  Container background(BuildContext context, double sizeHeight) {
+    return Container(
+      margin: EdgeInsets.only(
+        top: sizeHeight,
+      ),
+      height: MediaQuery.of(context).size.height * 0.80,
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30.0),
+          topRight: Radius.circular(30.0),
+        ),
+        color: Color(0xFFC78E07),
+      ),
+    );
   }
 }

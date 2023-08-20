@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:loan_app/models/borrower.dart';
 import 'package:loan_app/models/loan.dart';
 import 'package:loan_app/models/transaction.dart';
@@ -232,6 +233,15 @@ class FirestoreService {
     } catch (e) {
       print(e);
       return 'Enter MPIN';
+    }
+  }
+
+  void updateMPIN({required int mpin, required BuildContext context}) {
+    try {
+      String uid = AuthService().user.uid;
+      _db.collection(_userCollection).doc(uid).update({'mpin': mpin});
+    } catch (e) {
+      print(e);
     }
   }
 
