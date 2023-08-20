@@ -49,8 +49,9 @@ Widget textField(
                 controller: controller,
                 decoration: InputDecoration(
                   hintText: hint,
-                  hintStyle:
-                      const TextStyle(color: Color(0xFFB5AFAF), fontSize: 15.0),
+                  hintStyle: const TextStyle(
+                      color: Color.fromARGB(255, 254, 254, 254),
+                      fontSize: 15.0),
                   border: InputBorder.none,
                 ),
               ),

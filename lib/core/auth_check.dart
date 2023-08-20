@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:loan_app/services/firestore_service.dart';
+import 'package:loan_app/ui/views/auth/m_pin.dart';
 import 'package:loan_app/ui/views/bording_screen/bording_screen.dart';
 import 'package:loan_app/ui/views/home.dart';
 import 'package:loan_app/ui/views/splash_screen.dart';
@@ -57,7 +59,21 @@ class _AuthCheckState extends State<AuthCheck> {
                 if (user == null) {
                   return const OnbordingScreen();
                 } else {
-                  return const HomePage();
+                  // chek if user has MPIN
+                  FirestoreService().hasMPIN().then((value) {
+                    if (value) {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MPINScreen()));
+                    } else {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const HomePage()));
+                    }
+                  });
+                  // return MPINScreen();
                 }
               }
               return const SplashScreen();

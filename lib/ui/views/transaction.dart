@@ -151,6 +151,7 @@ class _TransactionState extends State<Transaction> {
           customSnackbar(message: 'Something went wrong', context: context);
         }
       }).catchError(
+        // ignore: invalid_return_type_for_catch_error
         (error) => customSnackbar(message: error.toString(), context: context),
       );
 

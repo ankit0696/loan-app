@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:loan_app/ui/views/bording_page.dart';
-import 'package:loan_app/ui/widgets/app_background.dart';
 import 'package:loan_app/ui/widgets/content_box.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 

@@ -9,8 +9,6 @@ import 'package:loan_app/ui/widgets/custom_snackbar.dart';
 import 'package:loan_app/ui/widgets/header.dart';
 import 'package:loan_app/ui/widgets/textfield.dart';
 
-import '../widgets/circular_avatar.dart';
-
 class LoanForm extends StatefulWidget {
   final String borrowerId;
   final String borrowerName;
@@ -24,7 +22,6 @@ class LoanForm extends StatefulWidget {
 }
 
 class _LoanFormState extends State<LoanForm> {
-  bool _loading = false;
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _interestRateController = TextEditingController();
@@ -55,7 +52,6 @@ class _LoanFormState extends State<LoanForm> {
   }
 
   Future<void> _submitForm() async {
-    _loading = true;
     try {
       if (_formKey.currentState!.validate()) {
         // Extract form values and create new loan
@@ -76,11 +72,9 @@ class _LoanFormState extends State<LoanForm> {
 
         _saveData(newLoan);
       } else {
-        _loading = false;
         customSnackbar(message: 'Please fill all the fields', context: context);
       }
     } catch (e) {
-      _loading = false;
       customSnackbar(message: e.toString(), context: context);
     }
   }
@@ -88,15 +82,12 @@ class _LoanFormState extends State<LoanForm> {
   _saveData(LoanModel newLoan) {
     FirestoreService().addLoan(newLoan).then((value) {
       if (value != 'success') {
-        _loading = false;
         customSnackbar(message: value, context: context);
       }
       if (value == 'success') {
-        _loading = false;
         customSnackbar(message: 'Loan added successfully', context: context);
       }
     }).catchError((e) {
-      _loading = false;
       customSnackbar(message: e.toString(), context: context);
     });
     // Navigate back to borrower detail page

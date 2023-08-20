@@ -1,12 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:loan_app/models/user.dart';
 import 'package:loan_app/services/auth_service.dart';
 import 'package:loan_app/services/firestore_service.dart';
+import 'package:loan_app/ui/views/auth/sign_in.dart';
 import 'package:loan_app/ui/views/home.dart';
-import 'package:loan_app/ui/views/sign_in.dart';
 import 'package:loan_app/ui/widgets/app_background.dart';
-import 'package:loan_app/ui/widgets/circular_avatar.dart';
 import 'package:loan_app/ui/widgets/custom_button.dart';
 import 'package:loan_app/ui/widgets/custom_snackbar.dart';
 import 'package:loan_app/ui/widgets/header.dart';

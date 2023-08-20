@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:loan_app/ui/views/sign_in.dart';
-import 'package:loan_app/ui/views/sign_up.dart';
+import 'package:loan_app/ui/views/auth/sign_in.dart';
+import 'package:loan_app/ui/views/auth/sign_up.dart';
 import 'package:loan_app/ui/widgets/custom_button.dart';
 
 class BordingPage extends StatefulWidget {

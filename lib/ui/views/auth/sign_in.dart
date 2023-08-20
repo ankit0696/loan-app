@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:loan_app/services/auth_service.dart';
+import 'package:loan_app/ui/views/auth/sign_up.dart';
 import 'package:loan_app/ui/views/home.dart';
-import 'package:loan_app/ui/views/sign_up.dart';
 import 'package:loan_app/ui/widgets/app_background.dart';
-import 'package:loan_app/ui/widgets/circular_avatar.dart';
 import 'package:loan_app/ui/widgets/custom_button.dart';
 import 'package:loan_app/ui/widgets/custom_snackbar.dart';
 import 'package:loan_app/ui/widgets/header.dart';
@@ -183,9 +180,9 @@ class _SigninScreenState extends State<SigninScreen> {
           borderRadius: BorderRadius.circular(10.0),
           border: Border.all(color: const Color(0xFF9F6609), width: 1.0),
         ),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(
               Icons.g_mobiledata,
               color: Colors.red,

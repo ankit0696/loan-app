@@ -22,9 +22,39 @@ class FirestoreService {
           .snapshots();
     } catch (e) {
       print(e);
-      return Stream.empty();
+      return const Stream.empty();
     }
   }
+
+  // check if current user has MPIN
+  Future<bool> hasMPIN() async {
+    try {
+      String uid = AuthService().user.uid;
+      QuerySnapshot snapshot = await _db
+          .collection(_userCollection)
+          .where('id', isEqualTo: uid)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        return snapshot.docs[0].get('mpin') != 0;
+      }
+      return false;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  //     if (snapshot.docs[0].data()['mPin'] != null) {
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //     return Future.error(e);
+  //   }
+  // }
 
   // get loans data
   Stream<QuerySnapshot> getLoans(String borrowerId) {
@@ -36,7 +66,7 @@ class FirestoreService {
           .snapshots();
     } catch (e) {
       print(e);
-      return Stream.empty();
+      return const Stream.empty();
     }
   }
 
@@ -49,7 +79,7 @@ class FirestoreService {
           .snapshots();
     } catch (e) {
       print(e);
-      return Stream.empty();
+      return const Stream.empty();
     }
   }
 
@@ -83,7 +113,7 @@ class FirestoreService {
           .snapshots();
     } catch (e) {
       print(e);
-      return Stream.empty();
+      return const Stream.empty();
     }
   }
 
@@ -108,7 +138,7 @@ class FirestoreService {
           .snapshots();
     } catch (e) {
       print(e);
-      return Stream.empty();
+      return const Stream.empty();
     }
   }
 
@@ -175,6 +205,33 @@ class FirestoreService {
     } catch (e) {
       print(e);
       return const Stream.empty();
+    }
+  }
+
+  Future<String> fetchMPINFromFirestoreAndMatch(int mpin) async {
+    // if mpin null, return 'Enter MPIN' if mpin does not match return 'Invalid MPIN' else return 'MPIN verified!'
+    try {
+      String uid = AuthService().user.uid;
+      QuerySnapshot snapshot = await _db
+          .collection(_userCollection)
+          .where('id', isEqualTo: uid)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        if (snapshot.docs[0].get('mpin') != null) {
+          if (snapshot.docs[0].get('mpin') == mpin) {
+            return 'MPIN verified!';
+          } else {
+            return 'Invalid MPIN';
+          }
+        } else {
+          return 'Enter MPIN';
+        }
+      }
+      return 'Enter MPIN';
+    } catch (e) {
+      print(e);
+      return 'Enter MPIN';
     }
   }
 

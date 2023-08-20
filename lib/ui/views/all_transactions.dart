@@ -1,11 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:loan_app/models/transaction.dart';
 import 'package:loan_app/services/firestore_service.dart';
 import 'package:loan_app/ui/widgets/formate_amount.dart';
-import 'package:loan_app/ui/widgets/header.dart';
 
 class AllTransactions extends StatefulWidget {
   const AllTransactions({super.key});
