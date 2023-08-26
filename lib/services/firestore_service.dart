@@ -131,12 +131,18 @@ class FirestoreService {
     }
   }
 
-  Stream<QuerySnapshot> getBorrowers(String lenderId) {
+  Stream<QuerySnapshot> getBorrowers(String lenderId, {int? limit}) {
     try {
-      return _db
+      // make it descending order bu date
+      Query query = _db
           .collection(_borrowerCollection)
           .where('lenderId', isEqualTo: lenderId)
-          .snapshots();
+          .orderBy('date', descending: true);
+
+      if (limit != null) {
+        query = query.limit(limit);
+      }
+      return query.snapshots();
     } catch (e) {
       print(e);
       return const Stream.empty();

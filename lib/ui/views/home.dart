@@ -7,6 +7,7 @@ import 'package:loan_app/services/auth_service.dart';
 import 'package:loan_app/services/firestore_service.dart';
 import 'package:loan_app/ui/shimmer_screens/home_shimmer.dart';
 import 'package:loan_app/ui/views/account.dart';
+import 'package:loan_app/ui/views/all_borrowers.dart';
 import 'package:loan_app/ui/views/all_transactions.dart';
 import 'package:loan_app/ui/views/borrower_form.dart';
 import 'package:loan_app/ui/views/profile_page.dart';
@@ -95,7 +96,7 @@ Stream<QuerySnapshot> get stream => getBorrower();
 
 Stream<QuerySnapshot> getBorrower() {
   final String? leander = AuthService().user.uid;
-  return FirestoreService().getBorrowers(leander!);
+  return FirestoreService().getBorrowers(leander!, limit: 5);
 }
 
 Stream<QuerySnapshot> get streamTransaction => getTransactions();
@@ -251,9 +252,30 @@ class _HomeState extends State<Home> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-              padding: EdgeInsets.only(left: 20.0, bottom: 10.0),
-              child: Header(title: "Borrowers")),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Row(
+              children: [
+                const Header(title: "Borrowers"),
+                const Spacer(),
+                //view all button
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AllBorrowers(),
+                      ),
+                    );
+                  },
+                  child: const Header(
+                    title: "View All",
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Flexible(
             child: ListView(
               scrollDirection: Axis.horizontal,
@@ -263,9 +285,11 @@ class _HomeState extends State<Home> {
                   child: InkWell(
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const BorrowForm()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const BorrowForm(),
+                        ),
+                      );
                     },
                     child: Column(
                       children: [
@@ -315,10 +339,12 @@ class _HomeState extends State<Home> {
                               child: InkWell(
                                 onTap: () {
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => AccountPage(
-                                              borrowerId: borrower.id)));
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          AccountPage(borrowerId: borrower.id),
+                                    ),
+                                  );
                                 },
                                 child: Column(
                                   children: [
@@ -329,11 +355,16 @@ class _HomeState extends State<Home> {
                                       radius: 60.0,
                                     ),
                                     const SizedBox(height: 10.0),
-                                    Text(
-                                      borrower.name,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15.0,
+                                    SizedBox(
+                                      width: 75.0,
+                                      child: Text(
+                                        borrower.name,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          color: Colors.black,
+                                          fontSize: 15.0,
+                                        ),
                                       ),
                                     ),
                                   ],

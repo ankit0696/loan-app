@@ -226,9 +226,9 @@ class Account extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text("No Data Found"));
-        }
+        // if (snapshot.data!.docs.isEmpty) {
+        //   return const Center(child: Text("No Data Found"));
+        // }
         return ListView.builder(
           shrinkWrap: true,
           physics: const BouncingScrollPhysics(),

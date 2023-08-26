@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:loan_app/models/transaction.dart';
 import 'package:loan_app/services/firestore_service.dart';
 import 'package:loan_app/ui/widgets/app_background.dart';
-import 'package:loan_app/ui/widgets/circular_avatar.dart';
 import 'package:loan_app/ui/widgets/custom_back_button.dart';
 import 'package:loan_app/ui/widgets/formate_amount.dart';
 import 'package:loan_app/ui/widgets/header.dart';
@@ -28,9 +27,6 @@ class _AllTransactionsState extends State<AllTransactions> {
       child: SafeArea(
           child: Scaffold(
         backgroundColor: Colors.transparent,
-        // appBar: AppBar(
-        //   title: const Text("All Transactions"),
-        // ),
         body: bodyWidget(),
       )),
     );

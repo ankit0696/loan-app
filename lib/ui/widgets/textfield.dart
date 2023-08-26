@@ -8,6 +8,7 @@ Widget textField(
     IconData? icon,
     bool? isPassword,
     bool? disabled,
+    Function(String)? onChanged,
     BuildContext? context,
     TextInputType? keyboardType,
     Function()? onIconTap,
@@ -53,6 +54,7 @@ Widget textField(
                       color: Color.fromARGB(255, 0, 0, 0), fontSize: 15.0),
                   border: InputBorder.none,
                 ),
+                onChanged: onChanged,
               ),
             ),
             InkWell(
