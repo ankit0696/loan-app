@@ -236,7 +236,7 @@ class _TransactionState extends State<Transaction> {
       transactions.add(TransactionModel(
         id: '',
         amount: amountLeft,
-        date: DateTime.now(),
+        date: DateTime.parse(_dateController.text),
         createdDate: DateTime.now(),
         dueDate: _dueDate,
         borrowerId: widget.loan.borrowerId,
@@ -253,7 +253,7 @@ class _TransactionState extends State<Transaction> {
       transactions.add(TransactionModel(
         id: '',
         amount: amount,
-        date: DateTime.now(),
+        date: DateTime.parse(_dateController.text),
         createdDate: DateTime.now(),
         dueDate: DateTime.now(),
         borrowerId: widget.loan.borrowerId,
@@ -354,6 +354,10 @@ class _TransactionState extends State<Transaction> {
                                 if (double.tryParse(value) == null) {
                                   return 'Please enter a valid number';
                                 }
+                                if (double.tryParse(value)! >
+                                    widget.loan.amount) {
+                                  return 'Amount cannot be more than principal';
+                                }
                                 return null;
                               },
                             ),
@@ -366,10 +370,10 @@ class _TransactionState extends State<Transaction> {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter a date';
                                 }
-                                final date = DateTime.tryParse(value);
-                                if (date == null) {
-                                  return 'Please enter a valid date';
-                                }
+                                // final date = DateTime.tryParse(value);
+                                // if (date == null) {
+                                //   return 'Please enter a valid date';
+                                // }
                                 return null;
                               },
                               onTap: () async {
@@ -385,25 +389,42 @@ class _TransactionState extends State<Transaction> {
                                 }
                               },
                             ),
-                            DropdownButtonFormField<String>(
-                              value: _transactionType,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  _transactionType = newValue!;
-                                });
-                              },
-                              decoration: const InputDecoration(
-                                labelText: 'Transaction Type',
+                            Container(
+                              margin: const EdgeInsets.symmetric(vertical: 5.0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0,
                               ),
-                              items: <String>[
-                                'interest',
-                                'principal',
-                              ].map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value.toUpperCase()),
-                                );
-                              }).toList(),
+                              width: double.infinity,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: const Color(0xFF9F6609),
+                                  width: 1.0,
+                                ),
+                                color: const Color(0x19FFC107),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              child: DropdownButtonFormField<String>(
+                                value: _transactionType,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    _transactionType = newValue!;
+                                  });
+                                },
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  // labelText: 'Transaction Type',
+                                ),
+                                items: <String>[
+                                  'interest',
+                                  'principal',
+                                ].map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value.toUpperCase()),
+                                  );
+                                }).toList(),
+                              ),
                             ),
                             const SizedBox(height: 16.0),
                             // TextFormField(
@@ -420,7 +441,8 @@ class _TransactionState extends State<Transaction> {
                             ),
                             const Spacer(),
                             CustomButton(
-                                onPressed: _submitForm, buttonText: "Add Loan"),
+                                onPressed: _submitForm,
+                                buttonText: "Add Transaction"),
                             const SizedBox(height: 16.0),
                           ],
                         ),

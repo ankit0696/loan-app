@@ -7,6 +7,7 @@ import 'package:loan_app/ui/views/transaction.dart';
 import 'package:loan_app/ui/widgets/card_view.dart';
 import 'package:loan_app/ui/widgets/custom_back_button.dart';
 import 'package:loan_app/ui/widgets/custom_button.dart';
+import 'package:loan_app/ui/widgets/custom_snackbar.dart';
 import 'package:loan_app/ui/widgets/formate_amount.dart';
 import 'package:loan_app/ui/widgets/header.dart';
 
@@ -69,10 +70,15 @@ class _LoanState extends State<Loan> {
         width: MediaQuery.of(context).size.width * 0.9,
         child: CustomButton(
           onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => TransactionForm(loan: widget.loan)));
+            if (widget.loan.isActive) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          TransactionForm(loan: widget.loan)));
+            } else {
+              customSnackbar(message: "Loan is not Active", context: context);
+            }
           },
           buttonText: "Add transaction",
         ),
@@ -104,10 +110,63 @@ class _LoanState extends State<Loan> {
       ),
       child: Column(
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              CustomBackButton(),
+              const CustomBackButton(),
+
+              // make loan inactive dialogbox to ask are yuo sure
+              !widget.loan.isActive
+                  ? TextButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                                    title: const Text("Are you sure?"),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text("No"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      TextButton(
+                                          child: const Text("Yes"),
+                                          onPressed: () {
+                                            FirestoreService()
+                                                .updateActiveOfLoan(
+                                                    widget.loan.id,
+                                                    isActive: true);
+                                            Navigator.pop(context);
+                                          })
+                                    ]));
+                      },
+                      child: const Text("Open Loan"))
+                  : TextButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                                    title: const Text("Are you sure?"),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text("No"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      TextButton(
+                                          child: const Text("Yes"),
+                                          onPressed: () {
+                                            FirestoreService()
+                                                .updateActiveOfLoan(
+                                                    widget.loan.id,
+                                                    isActive: false);
+                                            Navigator.pop(context);
+                                          })
+                                    ]));
+                      },
+                      child: const Text("Close Loan"))
             ],
           ),
           _loanCard(widget.loan),
@@ -152,10 +211,13 @@ class _LoanState extends State<Loan> {
             ),
             // const Header(
             //     title: "₹ 1,00,000", fontSize: 30.0, color: Colors.white),
-            _loanDetailRow("Principal Left", formatAmount(principleLeft)),
-            _loanDetailRow("Intrest rate", "${loan.interestRate}%"),
-            _loanDetailRow("Collateral", loan.collateral),
-            _loanDetailRow("Intrest Amount", formatAmount(interest)),
+            _loanDetailRow(
+                "Principal Left", formatAmount(principleLeft), () {}),
+            _loanDetailRow("Intrest rate", "${loan.interestRate}%", () {}),
+            _loanDetailRow("Intrest Amount", formatAmount(interest), () {}),
+            _loanDetailRow("Collateral", " see collateral", () {
+              showCollateralDialog(loan.collaterals);
+            }),
           ],
         ),
       ),
@@ -242,29 +304,71 @@ class _LoanState extends State<Loan> {
         });
   }
 
-  Widget _loanDetailRow(String title, String value) {
+  Widget _loanDetailRow(String title, String value, Function() onTap) {
     return Container(
       margin: const EdgeInsets.only(top: 10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Header(title: title, fontSize: 15.0, color: Colors.white),
-          Header(title: value, fontSize: 14.0, color: Colors.white),
+          InkWell(
+              onTap: onTap,
+              child: Header(title: value, fontSize: 14.0, color: Colors.white)),
         ],
       ),
     );
   }
 
-  _floatingActionButton() {
-    // add new transaction
-    return FloatingActionButton(
-      onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => TransactionForm(loan: widget.loan)));
-      },
-      child: const Icon(Icons.add),
-    );
+  // make a dialog to see colateral list
+  void showCollateralDialog(List<Collateral> collaterals) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Collateral"),
+
+                // close button
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.close),
+                )
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: collaterals.map((collateral) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(
+                      vertical: 8.0), // Adjust margin as needed
+                  padding:
+                      const EdgeInsets.all(8.0), // Adjust padding as needed
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey, // Set border color
+                      width: 1.0, // Set border width
+                    ),
+                    borderRadius:
+                        BorderRadius.circular(8.0), // Set border radius
+                  ),
+                  child: ListTile(
+                    // show image with url
+                    leading: collateral.imageUrl.isEmpty
+                        ? const Icon(Icons.ac_unit_rounded)
+                        : CircleAvatar(
+                            backgroundImage: NetworkImage(
+                            collateral.imageUrl,
+                          )),
+                    title: Text(collateral.description),
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+        });
   }
 }

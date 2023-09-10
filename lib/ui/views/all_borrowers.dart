@@ -128,6 +128,16 @@ class _AllBorrowersState extends State<AllBorrowers> {
               BorrowerModel borrower = BorrowerModel.fromJson(
                   snapshot.data!.docs[index].data() as Map<String, dynamic>);
               return ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AccountPage(
+                        borrowerId: borrower.id,
+                      ),
+                    ),
+                  );
+                },
                 leading: const CircleAvatar(
                   backgroundImage: NetworkImage(
                       "https://avatars.githubusercontent.com/u/61448739?v=4"),
@@ -136,24 +146,12 @@ class _AllBorrowersState extends State<AllBorrowers> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AccountPage(
-                              borrowerId: borrower.id,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Row(
-                        children: [
-                          Text(borrower.name,
-                              style: const TextStyle(
-                                  fontSize: 15, color: Colors.black)),
-                        ],
-                      ),
+                    Row(
+                      children: [
+                        Text(borrower.name,
+                            style: const TextStyle(
+                                fontSize: 15, color: Colors.black)),
+                      ],
                     ),
                     Text(
                         "Borrowed on: ${borrower.date.toIso8601String().split("T")[0]}",

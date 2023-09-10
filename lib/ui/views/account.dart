@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:loan_app/models/borrower.dart';
 import 'package:loan_app/models/loan.dart';
 import 'package:loan_app/services/firestore_service.dart';
+import 'package:loan_app/ui/views/borrower_form.dart';
 import 'package:loan_app/ui/views/loan_detail.dart';
 import 'package:loan_app/ui/views/new_loan.dart';
 import 'package:loan_app/ui/widgets/app_background.dart';
@@ -90,10 +91,32 @@ class Account extends StatelessWidget {
             background(context, sizeHeight),
             Padding(
               padding: EdgeInsets.only(top: sizeHeight),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CustomBackButton(),
+                  const CustomBackButton(),
+                  Container(
+                    margin: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100.0),
+                        border: Border.all(
+                          color: Colors.white,
+                        )),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BorrowForm(id: borrower.id),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
@@ -332,154 +355,6 @@ class Account extends StatelessWidget {
           ),
         ),
       ),
-      // child: Container(
-      //   margin: const EdgeInsets.all(15.0),
-      //   // padding: const EdgeInsets.all(15.0),
-      //   width: double.infinity,
-      //   height: 200,
-      //   decoration: BoxDecoration(
-      //     boxShadow: const [
-      //       BoxShadow(
-      //         color: Colors.grey,
-      //         blurRadius: 5.0,
-      //         spreadRadius: 1.0,
-      //         offset: Offset(0.0, 0.0),
-      //       ),
-      //     ],
-      //     // color gradient
-      //     gradient: LinearGradient(
-      //       begin: Alignment.topLeft,
-      //       end: Alignment.bottomRight,
-      //       colors: [
-      //         loan.isActive ? const Color(0xFFC78E07) : Colors.red.shade600,
-      //         loan.isActive ? const Color(0xFFE7B60B) : Colors.red.shade200,
-      //       ],
-      //     ),
-      //     borderRadius: BorderRadius.circular(10.0),
-      //   ),
-      //   child: Stack(
-      //     children: [
-      //       Positioned(
-      //         bottom: -80,
-      //         right: 20,
-      //         child: ClipRect(
-      //           child: Container(
-      //             margin: const EdgeInsets.all(15.0),
-      //             padding: const EdgeInsets.all(80.0),
-      //             decoration: BoxDecoration(
-      //               gradient: LinearGradient(
-      //                 begin: Alignment.topLeft,
-      //                 end: Alignment.bottomRight,
-      //                 colors: [
-      //                   loan.isActive
-      //                       ? const Color(0xFFF7CF18).withOpacity(0.37)
-      //                       : Colors.red.shade600.withOpacity(0.37),
-      //                   loan.isActive
-      //                       ? const Color(0xFFE7B60B).withOpacity(0.37)
-      //                       : Colors.red.shade200.withOpacity(0.37),
-      //                 ],
-      //               ),
-      //               borderRadius: BorderRadius.circular(100.0),
-      //             ),
-      //           ),
-      //         ),
-      //       ),
-      //       Positioned(
-      //         top: -80,
-      //         left: -10,
-      //         child: ClipRect(
-      //           child: Container(
-      //             margin: const EdgeInsets.all(15.0),
-      //             padding: const EdgeInsets.all(80.0),
-      //             decoration: BoxDecoration(
-      //               gradient: LinearGradient(
-      //                 begin: Alignment.topLeft,
-      //                 end: Alignment.bottomRight,
-      //                 colors: [
-      //                   loan.isActive
-      //                       ? const Color(0xFFF7CF18).withOpacity(0.67)
-      //                       : Colors.red.shade600.withOpacity(0.67),
-      //                   loan.isActive
-      //                       ? const Color(0xFFE7B60B).withOpacity(0.67)
-      //                       : Colors.red.shade200.withOpacity(0.67),
-      //                 ],
-      //               ),
-      //               borderRadius: BorderRadius.circular(100.0),
-      //             ),
-      //           ),
-      //         ),
-      //       ),
-      //       Padding(
-      //         padding: const EdgeInsets.all(15.0),
-      //         child: Column(
-      //           mainAxisAlignment: MainAxisAlignment.start,
-      //           crossAxisAlignment: CrossAxisAlignment.start,
-      //           children: [
-      //             Row(
-      //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //               children: [
-      //                 Header(
-      //                     title: formatAmount(loan.amount),
-      //                     fontSize: 30.0,
-      //                     color: Colors.white),
-      //                 Header(
-      //                     title: loan.date.toIso8601String().split("T")[0],
-      //                     fontSize: 15.0,
-      //                     color: Colors.white),
-      //               ],
-      //             ),
-      //             // Header(
-      //             //     title: loan.amount.toString(),
-      //             //     fontSize: 15.0,
-      //             //     color: Colors.white),
-      //             const Spacer(),
-      //             Row(
-      //               children: [
-      //                 Column(
-      //                   mainAxisAlignment: MainAxisAlignment.start,
-      //                   crossAxisAlignment: CrossAxisAlignment.start,
-      //                   children: [
-      //                     const Header(
-      //                         title: "Intrest rate",
-      //                         fontSize: 15.0,
-      //                         color: Colors.white),
-      //                     Header(
-      //                         title: "${loan.interestRate}%",
-      //                         fontSize: 14.0,
-      //                         color: Colors.white),
-      //                   ],
-      //                 ),
-      //                 const Spacer(),
-      //                 Container(
-      //                   padding: const EdgeInsets.all(5.0),
-      //                   decoration: BoxDecoration(
-      //                     color: Colors.white.withOpacity(0.5),
-      //                     borderRadius: BorderRadius.circular(20.0),
-      //                   ),
-      //                   child: Row(
-      //                     children: [
-      //                       Icon(
-      //                         loan.isActive ? Icons.check_circle : Icons.close,
-      //                         color:
-      //                             loan.isActive ? Colors.green : Colors.black,
-      //                       ),
-      //                       Header(
-      //                           title: loan.isActive ? "Active" : "Done",
-      //                           fontSize: 14.0,
-      //                           color: loan.isActive
-      //                               ? Colors.green
-      //                               : Colors.black),
-      //                     ],
-      //                   ),
-      //                 ),
-      //               ],
-      //             ),
-      //           ],
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
 
@@ -563,11 +438,11 @@ class Account extends StatelessWidget {
                 ),
               ),
             ),
-            Center(
+            const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
+                children: [
                   Icon(
                     Icons.add,
                     color: Colors.white,

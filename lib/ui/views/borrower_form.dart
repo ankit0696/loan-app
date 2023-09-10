@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
@@ -11,7 +12,8 @@ import 'package:loan_app/ui/widgets/header.dart';
 import 'package:loan_app/ui/widgets/textfield.dart';
 
 class BorrowForm extends StatefulWidget {
-  const BorrowForm({super.key});
+  final String? id;
+  const BorrowForm({super.key, this.id});
 
   @override
   State<BorrowForm> createState() => _BorrowFormState();
@@ -34,6 +36,25 @@ class _BorrowFormState extends State<BorrowForm> {
     super.initState();
     lenderId = AuthService().user.uid;
     _dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    if (widget.id != null) {
+      borrowerId = widget.id!;
+      populateData(borrowerId);
+    }
+  }
+
+  populateData(String borrowerId) async {
+    final borrower = await FirestoreService().getBorrowerById(borrowerId);
+    if (borrower != null) {
+      setState(() {
+        // Populate the form fields with data
+        _nameController.text = borrower.name;
+        _phoneController.text = borrower.phone;
+        _addressController.text = borrower.address;
+        _aadharNumberController.text = borrower.aadharNumber;
+        // You can populate other fields similarly if needed
+      });
+    }
   }
 
   @override
@@ -50,15 +71,22 @@ class _BorrowFormState extends State<BorrowForm> {
     try {
       if (_formKey.currentState!.validate()) {
         final BorrowerModel borrowerModel = BorrowerModel(
-            id: '',
-            name: _nameController.text,
-            phone: _phoneController.text,
-            date: DateTime.parse(_dateController.text),
-            address: _addressController.text,
-            aadharNumber: _aadharNumberController.text,
-            lenderId: lenderId);
+          id: borrowerId, // Use the existing borrower's ID if editing
+          name: _nameController.text,
+          phone: _phoneController.text,
+          date: DateTime.now(),
+          address: _addressController.text,
+          aadharNumber: _aadharNumberController.text,
+          lenderId: lenderId,
+        );
 
-        _saveData(borrowerModel);
+        if (widget.id != null) {
+          // Editing an existing borrower
+          _updateBorrower(borrowerModel);
+        } else {
+          // Adding a new borrower
+          _addBorrower(borrowerModel);
+        }
       } else {
         _loading = false;
       }
@@ -70,7 +98,24 @@ class _BorrowFormState extends State<BorrowForm> {
     }
   }
 
-  _saveData(BorrowerModel borrowerModel) {
+  _updateBorrower(BorrowerModel borrowerModel) {
+    FirestoreService().updateBorrower(borrowerModel).then((value) {
+      if (value == 'success') {
+        _loading = false;
+        customSnackbar(
+            context: context, message: 'Borrower updated successfully');
+      } else {
+        _loading = false;
+        customSnackbar(context: context, message: value);
+      }
+    }).catchError((e) {
+      _loading = false;
+      customSnackbar(context: context, message: e.toString());
+    });
+    Navigator.pop(context);
+  }
+
+  _addBorrower(BorrowerModel borrowerModel) {
     FirestoreService().addBorrower(borrowerModel).then((value) {
       if (value == 'success') {
         _loading = false;
@@ -102,8 +147,8 @@ class _BorrowFormState extends State<BorrowForm> {
                     background(context, sizeHeight),
                     Padding(
                       padding: EdgeInsets.only(top: sizeHeight),
-                      child: Row(
-                        children: const [
+                      child: const Row(
+                        children: [
                           CustomBackButton(),
                           Header(
                             title: "Borrower Form",
@@ -169,34 +214,34 @@ class _BorrowFormState extends State<BorrowForm> {
                                     return null;
                                   },
                                 ),
-                                textField(
-                                  controller: _dateController,
-                                  hint: 'Enter your date of birth',
-                                  icon: Icons.calendar_today,
-                                  keyboardType: TextInputType.datetime,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter a date';
-                                    }
-                                    final date = DateTime.tryParse(value);
-                                    if (date == null) {
-                                      return 'Please enter a valid date';
-                                    }
-                                    return null;
-                                  },
-                                  onTap: () async {
-                                    final date = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(1900),
-                                      lastDate: DateTime.now(),
-                                    );
-                                    if (date != null) {
-                                      _dateController.text =
-                                          DateFormat('yyyy-MM-dd').format(date);
-                                    }
-                                  },
-                                ),
+                                // textField(
+                                //   controller: _dateController,
+                                //   hint: 'Enter your date of birth',
+                                //   icon: Icons.calendar_today,
+                                //   keyboardType: TextInputType.datetime,
+                                //   validator: (value) {
+                                //     if (value == null || value.isEmpty) {
+                                //       return 'Please enter a date';
+                                //     }
+                                //     final date = DateTime.tryParse(value);
+                                //     if (date == null) {
+                                //       return 'Please enter a valid date';
+                                //     }
+                                //     return null;
+                                //   },
+                                //   onTap: () async {
+                                //     final date = await showDatePicker(
+                                //       context: context,
+                                //       initialDate: DateTime.now(),
+                                //       firstDate: DateTime(1900),
+                                //       lastDate: DateTime.now(),
+                                //     );
+                                //     if (date != null) {
+                                //       _dateController.text =
+                                //           DateFormat('yyyy-MM-dd').format(date);
+                                //     }
+                                //   },
+                                // ),
                                 textField(
                                   controller: _addressController,
                                   hint: 'Enter your address',

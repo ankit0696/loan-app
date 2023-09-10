@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loan_app/models/borrower.dart';
 import 'package:loan_app/models/loan.dart';
 import 'package:loan_app/models/transaction.dart';
@@ -12,6 +16,7 @@ class FirestoreService {
   final String _losnCollection = 'loans';
   final String _borrowerCollection = 'borrowers';
   final String _transactionCollection = 'transactions';
+  UploadTask? uploadTask;
 
   // get current user data
   Stream<QuerySnapshot> getCurrentUser(String uid) {
@@ -45,17 +50,6 @@ class FirestoreService {
       return false;
     }
   }
-
-  //     if (snapshot.docs[0].data()['mPin'] != null) {
-  //       return true;
-  //     } else {
-  //       return false;
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //     return Future.error(e);
-  //   }
-  // }
 
   // get loans data
   Stream<QuerySnapshot> getLoans(String borrowerId) {
@@ -105,6 +99,14 @@ class FirestoreService {
     }
   }
 
+  void updateActiveOfLoan(String id, {required bool isActive}) {
+    try {
+      _db.collection(_losnCollection).doc(id).update({'isActive': isActive});
+    } catch (e) {
+      print(e);
+    }
+  }
+
   // get borrower data
   Stream<QuerySnapshot> getBorrower(String borrowerId) {
     try {
@@ -128,6 +130,37 @@ class FirestoreService {
     } catch (e) {
       print(e);
       return e.toString();
+    }
+  }
+
+  Future<String> updateBorrower(BorrowerModel borrowerModel) async {
+    try {
+      // Get the borrower's document reference by ID
+      DocumentReference borrowerRef =
+          _db.collection(_borrowerCollection).doc(borrowerModel.id);
+
+      // Update the borrower's data
+      await borrowerRef.update(borrowerModel.toJson());
+
+      return 'success';
+    } catch (e) {
+      print(e);
+      return e.toString();
+    }
+  }
+
+  Future<BorrowerModel?> getBorrowerById(String borrowerId) async {
+    try {
+      final DocumentSnapshot borrowerDoc =
+          await _db.collection(_borrowerCollection).doc(borrowerId).get();
+      if (borrowerDoc.exists) {
+        return BorrowerModel.fromJson(
+            borrowerDoc.data() as Map<String, dynamic>);
+      }
+      return null; // Return null if borrower not found
+    } catch (e) {
+      print(e);
+      return null;
     }
   }
 
@@ -250,6 +283,51 @@ class FirestoreService {
       print(e);
     }
   }
+
+  uploadImageToFirebase(XFile pickedFile, String lenderId, String borrowwerId,
+      String collateralDescription) async {
+    try {
+      final path =
+          'images/collateral/$lenderId/$borrowwerId/$collateralDescription';
+      final File file = File(pickedFile.path);
+      final ref = FirebaseStorage.instance.ref().child(path);
+      uploadTask = ref.putFile(file);
+
+      final snapshot = await uploadTask!.whenComplete(() => {});
+
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+      print("downloadUrl$downloadUrl");
+      return downloadUrl;
+    } catch (e) {
+      print(e);
+      return e.toString();
+    }
+  }
+
+  // delete image from firebase storage from image link
+  Future<void> deleteImageFromFirebase(String imageUrl) async {
+    try {
+      // Parse the download URL to a reference
+      final ref = FirebaseStorage.instance.refFromURL(imageUrl);
+
+      // Delete the file
+      await ref.delete();
+
+      print("Image deleted successfully");
+    } catch (e) {
+      print("Error deleting image: $e");
+      throw e;
+    }
+  }
+
+  // Future<String> uploadImage(XFile image, String lenderId, String loanId, String colateral) async {
+  //   try {
+  //       final ref =
+  //   } catch (e) {
+  //     print(e);
+  //     return e.toString();
+  //   }
+  // }
 
 //   Future<void> setData(String path, Map<String, dynamic> data) async {
 //     final DocumentReference ref = _db.doc(path);

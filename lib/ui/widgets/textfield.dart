@@ -23,9 +23,9 @@ Widget textField(
       const SizedBox(height: 10.0),
       Container(
         margin: const EdgeInsets.symmetric(vertical: 5.0),
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
         width: double.infinity,
-        height: 50,
+        // height: 50,
         decoration: BoxDecoration(
           border: Border.all(
             color: const Color(0xFF9F6609),

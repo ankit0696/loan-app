@@ -5,7 +5,7 @@ class LoanModel {
   final DateTime date;
   final String borrowerId;
   final String lenderId;
-  final String collateral;
+  final List<Collateral> collaterals;
   final bool isActive;
 
   LoanModel({
@@ -15,11 +15,19 @@ class LoanModel {
     required this.date,
     required this.borrowerId,
     required this.lenderId,
-    required this.collateral,
+    required this.collaterals,
     required this.isActive,
   });
 
   factory LoanModel.fromJson(Map<String, dynamic> json) {
+    final List<dynamic> collateralsJson = json['collaterals'];
+    final List<Collateral> collaterals = collateralsJson.map((c) {
+      return Collateral(
+        description: c['description'],
+        imageUrl: c['imageUrl'],
+      );
+    }).toList();
+
     return LoanModel(
       id: json['id'],
       amount: json['amount'],
@@ -27,12 +35,16 @@ class LoanModel {
       date: DateTime.parse(json['date']),
       borrowerId: json['borrowerId'],
       lenderId: json['lenderId'],
-      collateral: json['collateral'],
+      collaterals: collaterals,
       isActive: json['isActive'],
     );
   }
 
   Map<String, dynamic> toJson() {
+    final List<Map<String, dynamic>> collateralsJson = collaterals.map((c) {
+      return c.toJson();
+    }).toList();
+
     return {
       'id': id,
       'amount': amount,
@@ -40,8 +52,25 @@ class LoanModel {
       'date': date.toIso8601String(),
       'borrowerId': borrowerId,
       'lenderId': lenderId,
-      'collateral': collateral,
+      'collaterals': collateralsJson,
       'isActive': isActive,
+    };
+  }
+}
+
+class Collateral {
+  final String description;
+  String imageUrl;
+
+  Collateral({
+    required this.description,
+    this.imageUrl = '',
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'description': description,
+      'imageUrl': imageUrl,
     };
   }
 }
