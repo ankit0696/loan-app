@@ -1,11 +1,13 @@
-import 'package:loan_app/models/borrower.dart';
+// import 'package:loan_app/models/borrower.dart';
 
-BorrowerModel borrowerMode = BorrowerModel(
-  id: "",
-  name: "name",
-  phone: "phone",
-  date: DateTime.now(),
-  address: "address",
-  aadharNumber: "aadharNumber",
-  lenderId: "lenderId",
-);
+// BorrowerModel borrowerMode = BorrowerModel(
+//   id: "",
+//   name: "name",
+//   phone: "phone",
+//   date: DateTime.now(),
+//   address: "address",
+//   aadharNumber: "aadharNumber",
+//   lenderId: "lenderId",
+// );
+
+String APP_NAME = 'Loan App';

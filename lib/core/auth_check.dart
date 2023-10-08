@@ -65,7 +65,7 @@ class _AuthCheckState extends State<AuthCheck> {
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => MPINScreen()));
+                              builder: (context) => const MPINScreen()));
                     } else {
                       Navigator.pushReplacement(
                           context,

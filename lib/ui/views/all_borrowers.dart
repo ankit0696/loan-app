@@ -1,14 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:loan_app/models/borrower.dart';
-import 'package:loan_app/models/transaction.dart';
 import 'package:loan_app/services/auth_service.dart';
 import 'package:loan_app/services/firestore_service.dart';
 import 'package:loan_app/ui/views/account.dart';
 import 'package:loan_app/ui/widgets/app_background.dart';
 import 'package:loan_app/ui/widgets/custom_back_button.dart';
 import 'package:loan_app/ui/widgets/custom_snackbar.dart';
-import 'package:loan_app/ui/widgets/formate_amount.dart';
 import 'package:loan_app/ui/widgets/header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -167,11 +165,11 @@ class _AllBorrowersState extends State<AllBorrowers> {
                         IconButton(
                           icon: Icon(
                             Icons.message,
-                            color: borrower.phone != null
+                            color: borrower.phone.isNotEmpty
                                 ? Colors.black
                                 : Colors.grey,
                           ),
-                          onPressed: borrower.phone != null
+                          onPressed: borrower.phone.isNotEmpty
                               ? () async {
                                   try {
                                     // write a custom message
@@ -214,11 +212,11 @@ class _AllBorrowersState extends State<AllBorrowers> {
                         IconButton(
                           icon: Icon(
                             Icons.call_rounded,
-                            color: borrower.phone != null
+                            color: borrower.phone.isNotEmpty
                                 ? Colors.black
                                 : Colors.grey,
                           ),
-                          onPressed: borrower.phone != null
+                          onPressed: borrower.phone.isNotEmpty
                               ? () async {
                                   try {
                                     final Uri url = Uri(

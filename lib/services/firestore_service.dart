@@ -6,16 +6,22 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loan_app/models/borrower.dart';
 import 'package:loan_app/models/loan.dart';
+import 'package:loan_app/models/notification.dart';
 import 'package:loan_app/models/transaction.dart';
 import 'package:loan_app/models/user.dart';
 import 'package:loan_app/services/auth_service.dart';
+import 'package:loan_app/services/notification_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FirestoreService {
+  final NotificationService _notificationService = NotificationService();
+
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final String _userCollection = 'users';
   final String _losnCollection = 'loans';
   final String _borrowerCollection = 'borrowers';
   final String _transactionCollection = 'transactions';
+  final String _notificationCollection = 'notifications';
   UploadTask? uploadTask;
 
   // get current user data
@@ -92,6 +98,18 @@ class FirestoreService {
           await _db.collection(_losnCollection).add(data.toJson());
       String loanId = loanRef.id;
       await loanRef.update({'id': loanId});
+
+      // create notification
+      NotificationModel notification = NotificationModel(
+        id: '',
+        loanId: loanId,
+        borrowerId: data.borrowerId,
+        lenderId: data.lenderId,
+        date: data.date,
+        notificationId: -1,
+      );
+
+      createLocalNotification(notification, data);
       return 'success';
     } catch (e) {
       print(e);
@@ -248,6 +266,19 @@ class FirestoreService {
     }
   }
 
+  Future<QuerySnapshot<Object?>> getBorrowerDetailsById(
+      String borrowerId) async {
+    try {
+      return await _db
+          .collection(_borrowerCollection)
+          .where('id', isEqualTo: borrowerId)
+          .get();
+    } catch (e) {
+      print(e);
+      return Future.error(e);
+    }
+  }
+
   Future<String> fetchMPINFromFirestoreAndMatch(int mpin) async {
     // if mpin null, return 'Enter MPIN' if mpin does not match return 'Invalid MPIN' else return 'MPIN verified!'
     try {
@@ -317,6 +348,65 @@ class FirestoreService {
     } catch (e) {
       print("Error deleting image: $e");
       throw e;
+    }
+  }
+
+  // count the notification for this lender
+  Future<int> countNotification() async {
+    try {
+      QuerySnapshot snapshot = await _db
+          .collection(_notificationCollection)
+          .where('lenderId', isEqualTo: AuthService().user.uid)
+          .get();
+      return snapshot.docs.length;
+    } catch (e) {
+      print(e);
+      return 0;
+    }
+  }
+
+  // add notification
+  Future<void> addNotification(
+      NotificationModel notificationModel, LoanModel data) async {
+    try {
+      DocumentReference notificationRef = await _db
+          .collection(_notificationCollection)
+          .add(notificationModel.toJson());
+      String id = notificationRef.id;
+      await notificationRef.update({'id': id});
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // create local notification
+  createLocalNotification(
+      NotificationModel notificationModel, LoanModel data) async {
+    // get lender name
+    BorrowerModel? lenderName = await getBorrowerById(data.borrowerId);
+
+    // calculate intrest
+    double intrest = (data.amount * data.interestRate) / 100;
+
+    try {
+      _notificationService.scheduleMonthlyRepeatingNotification(
+        title: "Loan Reminder",
+        body: "Borrower: ${lenderName!.name} has amount due of $intrest today",
+        initialScheduledDate: DateTime.now(),
+        notificationModel: notificationModel,
+        data: data,
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // delete loan
+  Future<void> deleteLoan(String id) async {
+    try {
+      await _db.collection(_losnCollection).doc(id).delete();
+    } catch (e) {
+      print(e);
     }
   }
 

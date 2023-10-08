@@ -526,19 +526,55 @@ class _LoanFormState extends State<LoanForm> {
     }
   }
 
-  _saveLoanData(LoanModel newLoan) {
-    FirestoreService().addLoan(newLoan).then((value) {
+  // _saveLoanData(LoanModel newLoan) {
+  //   if (!mounted) {
+  //     return;
+  //   }
+  //   try {
+  //     FirestoreService().addLoan(newLoan).then((value) {
+  //       if (value != 'success') {
+  //         customSnackbar(message: value, context: context);
+  //       }
+  //       if (value == 'success') {
+  //         customSnackbar(message: 'Loan added successfully', context: context);
+  //       }
+  //     }).catchError((e) {
+  //       customSnackbar(message: e.toString(), context: context);
+  //     });
+  //     // Navigate back to borrower detail page
+  //     if (mounted) {
+  //       Navigator.pop(context);
+  //     }
+  //   } catch (e) {
+  //     if (mounted) {
+  //     customSnackbar(message: e.toString(), context: context);
+  //   }
+  //   }
+  // }
+
+  _saveLoanData(LoanModel newLoan) async {
+    if (!mounted) {
+      return;
+    }
+
+    try {
+      String value = await FirestoreService().addLoan(newLoan);
       if (value != 'success') {
-        customSnackbar(message: value, context: context);
+        if (mounted) {
+          customSnackbar(message: value, context: context);
+        }
+      } else {
+        if (mounted) {
+          customSnackbar(message: 'Loan added successfully', context: context);
+          Navigator.pop(
+              context); // Navigate back only if the widget is still mounted
+        }
       }
-      if (value == 'success') {
-        customSnackbar(message: 'Loan added successfully', context: context);
+    } catch (e) {
+      if (mounted) {
+        customSnackbar(message: e.toString(), context: context);
       }
-    }).catchError((e) {
-      customSnackbar(message: e.toString(), context: context);
-    });
-    // Navigate back to borrower detail page
-    Navigator.pop(context);
+    }
   }
 
   @override
@@ -702,7 +738,7 @@ class _LoanFormState extends State<LoanForm> {
                                               collateral.imageUrl,
                                             )),
                                       title: Text(collateral.description),
-                                      
+
                                       onTap: (() {
                                         showImageDialog(
                                             context,

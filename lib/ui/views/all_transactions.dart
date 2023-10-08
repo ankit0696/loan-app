@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:loan_app/models/borrower.dart';
 import 'package:loan_app/models/transaction.dart';
 import 'package:loan_app/services/firestore_service.dart';
 import 'package:loan_app/ui/widgets/app_background.dart';
@@ -18,6 +19,12 @@ Stream<QuerySnapshot> get stream => getTransactions();
 
 Stream<QuerySnapshot> getTransactions() {
   return FirestoreService().getAllTransactions();
+}
+
+// Future<QuerySnapshot> get future => getBorrowersDetails();
+
+Future<QuerySnapshot> getBorrowersDetails(String borrowerId) async {
+  return await FirestoreService().getBorrowerDetailsById(borrowerId);
 }
 
 class _AllTransactionsState extends State<AllTransactions> {
@@ -121,59 +128,76 @@ class _AllTransactionsState extends State<AllTransactions> {
             itemBuilder: (context, index) {
               TransactionModel transaction = TransactionModel.fromJson(
                   snapshot.data!.docs[index].data() as Map<String, dynamic>);
-              return ListTile(
-                leading: const CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "https://avatars.githubusercontent.com/u/61448739?v=4"),
-                ),
-                title: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(formatAmount(transaction.amount),
-                            style: const TextStyle(
-                                fontSize: 15, color: Colors.black)),
-                        Container(
-                          margin: const EdgeInsets.only(left: 5.0),
-                          padding: const EdgeInsets.all(2.0),
-                          decoration: BoxDecoration(
-                            color: transaction.transactionType == "principal"
-                                ? Colors.green.shade200
-                                : Colors.blue.shade200,
-                            borderRadius: BorderRadius.circular(5.0),
+              return FutureBuilder<QuerySnapshot>(
+                  future: getBorrowersDetails(transaction.borrowerId),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Center(
+                          child: Text("Something went wrong",
+                              style: TextStyle(color: Colors.red)));
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    BorrowerModel borrower = BorrowerModel.fromJson(
+                        snapshot.data!.docs[0].data() as Map<String, dynamic>);
+
+                    return ListTile(
+                      leading: const CircleAvatar(
+                        backgroundImage: NetworkImage(
+                            "https://avatars.githubusercontent.com/u/61448739?v=4"),
+                      ),
+                      title: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(formatAmount(transaction.amount),
+                                  style: const TextStyle(
+                                      fontSize: 15, color: Colors.black)),
+                              Container(
+                                margin: const EdgeInsets.only(left: 5.0),
+                                padding: const EdgeInsets.all(2.0),
+                                decoration: BoxDecoration(
+                                  color:
+                                      transaction.transactionType == "principal"
+                                          ? Colors.green.shade200
+                                          : Colors.blue.shade200,
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                child: Text(transaction.transactionType,
+                                    style: const TextStyle(
+                                        fontSize: 10, color: Colors.black)),
+                              )
+                            ],
                           ),
-                          child: Text(transaction.transactionType,
+                          Text(
+                              transaction.dueDate
+                                  .toIso8601String()
+                                  .split("T")[0],
                               style: const TextStyle(
-                                  fontSize: 10, color: Colors.black)),
-                        )
-                      ],
-                    ),
-                    Text(transaction.dueDate.toIso8601String().split("T")[0],
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey)),
-                  ],
-                ),
-                subtitle: Text(transaction.description ?? "",
-                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                trailing: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(transaction.date.toIso8601String().split("T")[0],
-                        style:
-                            const TextStyle(color: Colors.grey, fontSize: 12)),
-                    Text(
-                        transaction.date
-                            .toIso8601String()
-                            .split("T")[1]
-                            .split(".")[0],
-                        style:
-                            const TextStyle(color: Colors.grey, fontSize: 12)),
-                  ],
-                ),
-              );
+                                  fontSize: 12, color: Colors.grey)),
+                        ],
+                      ),
+                      subtitle: Text(transaction.description ?? "",
+                          style: const TextStyle(
+                              fontSize: 12, color: Colors.grey)),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(transaction.date.toIso8601String().split("T")[0],
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 12)),
+                          Text(borrower.name,
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 12)),
+                        ],
+                      ),
+                    );
+                  });
             },
           );
         });

@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:loan_app/models/borrower.dart';
 import 'package:loan_app/services/auth_service.dart';

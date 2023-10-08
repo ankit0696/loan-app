@@ -136,30 +136,91 @@ class _TransactionState extends State<Transaction> {
     super.dispose();
   }
 
+  // void _submitForm() {
+  //   if (_formKey.currentState!.validate()) {
+  //     if (widget.lastTransaction != null) {
+  //       totalIntrest = calculateTotalIntrest(widget.lastTransaction);
+  //     }
+  //     List<TransactionModel> transactions = _calculateTransaction();
+
+  //     FirestoreService().addTransaction(transactions).then((value) {
+  //       if (value == 'success') {
+  //         customSnackbar(
+  //             message: 'Transaction added successfully', context: context);
+  //       } else {
+  //         customSnackbar(message: 'Something went wrong', context: context);
+  //       }
+  //     }).catchError(
+  //       // ignore: invalid_return_type_for_catch_error
+  //       (error) => customSnackbar(message: error.toString(), context: context),
+  //     );
+
+  //     Navigator.pop(context);
+  //   } else {
+  //     customSnackbar(
+  //         message: 'Please fill all the required fields', context: context);
+  //   }
+  // }
+
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      if (widget.lastTransaction != null) {
-        totalIntrest = calculateTotalIntrest(widget.lastTransaction);
-      }
-      List<TransactionModel> transactions = _calculateTransaction();
-
-      FirestoreService().addTransaction(transactions).then((value) {
-        if (value == 'success') {
-          customSnackbar(
-              message: 'Transaction added successfully', context: context);
-        } else {
-          customSnackbar(message: 'Something went wrong', context: context);
-        }
-      }).catchError(
-        // ignore: invalid_return_type_for_catch_error
-        (error) => customSnackbar(message: error.toString(), context: context),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Confirm Submission"),
+            content:
+                const Text("Are you sure you want to submit this Transaction?"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                },
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                  _submitConfirmedForm(); // Call the submit function
+                },
+                child: const Text("Submit"),
+              ),
+            ],
+          );
+        },
       );
-
-      Navigator.pop(context);
     } else {
       customSnackbar(
-          message: 'Please fill all the required fields', context: context);
+        message: 'Please fill all the required fields',
+        context: context,
+      );
     }
+  }
+
+  void _submitConfirmedForm() {
+    if (widget.lastTransaction != null) {
+      totalIntrest = calculateTotalIntrest(widget.lastTransaction);
+    }
+    List<TransactionModel> transactions = _calculateTransaction();
+
+    FirestoreService().addTransaction(transactions).then((value) {
+      if (value == 'success') {
+        customSnackbar(
+          message: 'Transaction added successfully',
+          context: context,
+        );
+      } else {
+        customSnackbar(
+          message: 'Something went wrong',
+          context: context,
+        );
+      }
+    }).catchError(
+      // ignore: invalid_return_type_for_catch_error
+      (error) => customSnackbar(message: error.toString(), context: context),
+    );
+
+    Navigator.pop(context);
   }
 
   // calculate interest on last transactions
@@ -286,7 +347,9 @@ class _TransactionState extends State<Transaction> {
                     children: [
                       CustomBackButton(),
                       Header(
-                          title: "New Loan", fontSize: 20, color: Colors.white),
+                          title: "New Transaction",
+                          fontSize: 20,
+                          color: Colors.white),
                     ],
                   ),
                 ),

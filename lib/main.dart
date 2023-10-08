@@ -4,7 +4,10 @@ import 'package:loan_app/core/auth_check.dart';
 
 import 'firebase_options.dart';
 
+import 'package:timezone/data/latest_all.dart' as tz;
+
 void main() async {
+  tz.initializeTimeZones();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
