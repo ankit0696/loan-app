@@ -111,16 +111,13 @@ class _TransactionState extends State<Transaction> {
   void initState() {
     super.initState();
     _transactionType = 'interest'; // set the default transaction type
-    _dateController.text = DateFormat('dd-MM-yyyy').format(DateTime.now());
-    // print('last transaction ${widget.lastTransaction?.amount}');
-    // _dueDate = widget.loan.date.month < 12
-    //     ? DateTime(widget.loan.date.year, widget.loan.date.month + 1,
-    //         widget.loan.date.day)
-    //     : DateTime(widget.loan.date.year + 1, 1, widget.loan.date.day);
 
+    // set an initial date
+    _dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
     // use the last transaction due date as the due date for the new transaction
     if (widget.lastTransaction != null) {
       _dueDate = widget.lastTransaction![0].dueDate;
+      print("Due date::::::::::::: ${_dueDate}");
     } else {
       _dueDate = widget.loan.date.month < 12
           ? DateTime(widget.loan.date.year, widget.loan.date.month + 1,
@@ -269,6 +266,26 @@ class _TransactionState extends State<Transaction> {
               ? DateTime(_dueDate.year, _dueDate.month + 1, _dueDate.day)
               : DateTime(_dueDate.year + 1, 1, _dueDate.day);
         }
+      } else {
+        // diew date +1
+        _dueDate = _dueDate.month < 12
+            ? DateTime(_dueDate.year, _dueDate.month + 1, _dueDate.day)
+            : DateTime(_dueDate.year + 1, 1, _dueDate.day);
+
+        transactions.add(TransactionModel(
+          id: '',
+          amount: interestAmount,
+          date: DateTime.now(),
+          createdDate: DateTime.now(),
+          dueDate: _dueDate,
+          borrowerId: widget.loan.borrowerId,
+          loanId: widget.loan.id,
+          lenderId: widget.loan.lenderId,
+          description: _descriptionController.text.isNotEmpty
+              ? _descriptionController.text
+              : null,
+          transactionType: _transactionType,
+        ));
       }
 
       while (amountLeft > interestAmount) {
@@ -433,10 +450,12 @@ class _TransactionState extends State<Transaction> {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter a date';
                                 }
-                                // final date = DateTime.tryParse(value);
-                                // if (date == null) {
-                                //   return 'Please enter a valid date';
-                                // }
+                                print(
+                                    "value============================ ${value}");
+
+                                if (DateTime.parse(value) == null) {
+                                  return 'Please enter a valid date';
+                                }
                                 return null;
                               },
                               onTap: () async {

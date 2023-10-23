@@ -18,7 +18,6 @@ import 'package:loan_app/ui/widgets/circular_avatar.dart';
 import 'package:loan_app/ui/widgets/custom_snackbar.dart';
 import 'package:loan_app/ui/widgets/formate_amount.dart';
 import 'package:loan_app/ui/widgets/header.dart';
-import 'package:timezone/timezone.dart' as tz;
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -118,11 +117,31 @@ class _HomeState extends State<Home> {
 
   NotificationService notificationService = NotificationService();
 
+// financial information
+  double totalInvestedAmount = 0;
+  double totalInterestEarned = 0;
+  double totalPrincipalEarned = 0;
+
   @override
   void initState() {
     notificationService.getNotificationPermission();
     notificationService.initializeNotification();
+    fetchFinancialInformation();
+
     super.initState();
+  }
+
+  Future<void> fetchFinancialInformation() async {
+    String lenderId = AuthService().user.uid;
+    totalInvestedAmount =
+        await FirestoreService().getTotalInvestedAmount(lenderId);
+    totalInterestEarned =
+        await FirestoreService().getTotalInterestEarned(lenderId);
+    // totalPrincipalEarned =
+    //     await FirestoreService().getTotalPrincipalEarned(lenderId);
+    setState(() {
+      // Refresh the UI to display the results
+    });
   }
 
   @override
@@ -193,69 +212,122 @@ class _HomeState extends State<Home> {
         ),
         // color: Colors.grey[400],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ProfilePage()));
+                    },
+                    child: const CircularAvatar(
+                      imageUrl:
+                          "https://avatars.githubusercontent.com/u/61448739?v=4",
+                      radius: 60.0,
+                    ),
+                  ),
+                  const SizedBox(width: 20.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Header(
+                        title: user.name,
+                        fontSize: 20.0,
+                        color: Colors.white,
+                      ),
+                      const Header(
+                          title: "Welcome Back!",
+                          fontSize: 20.0,
+                          color: Colors.black),
+                    ],
+                  ),
+                ],
+              ),
               InkWell(
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ProfilePage()));
+                  customSnackbar(
+                    message: "Under Development",
+                    context: context,
+                    color: Colors.red,
+                  );
                 },
-                child: const CircularAvatar(
-                  imageUrl:
-                      "https://avatars.githubusercontent.com/u/61448739?v=4",
-                  radius: 60.0,
-                ),
-              ),
-              const SizedBox(width: 20.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Header(
-                    title: user.name,
-                    fontSize: 20.0,
+                child: Container(
+                  height: 40.0,
+                  width: 40.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.grey.withOpacity(0.43),
+                    border: const Border.fromBorderSide(
+                      BorderSide(
+                        color: Colors.white,
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.notifications,
                     color: Colors.white,
                   ),
-                  const Header(
-                      title: "Welcome Back!",
-                      fontSize: 20.0,
-                      color: Colors.black),
-                ],
+                ),
               ),
             ],
           ),
-          InkWell(
-            onTap: () {
-              customSnackbar(
-                message: "Under Development",
-                context: context,
-                color: Colors.red,
-              );
-            },
-            child: Container(
-              height: 40.0,
-              width: 40.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey.withOpacity(0.43),
-                border: const Border.fromBorderSide(
-                  BorderSide(
-                    color: Colors.white,
-                    width: 1.0,
-                  ),
-                ),
-              ),
-              child: const Icon(
-                Icons.notifications,
-                color: Colors.white,
+          Column(
+            children: [
+              _financialInformationCard("Invested Amount", totalInvestedAmount),
+              _financialInformationCard("Interest Earned", totalInterestEarned),
+              // _financialInformationCard(
+              //     "Principal Earned", totalPrincipalEarned),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _financialInformationCard(String title, double amount) {
+    return InkWell(
+      onDoubleTap: () {
+        // fetchFinancialInformation call the function
+        fetchFinancialInformation();
+      },
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 12.0,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
+            Text(
+              formatAmount(amount),
+              // "\$${amount.toStringAsFixed(2)}",
+              style: const TextStyle(
+                color: Colors.green,
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

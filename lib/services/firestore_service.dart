@@ -11,7 +11,6 @@ import 'package:loan_app/models/transaction.dart';
 import 'package:loan_app/models/user.dart';
 import 'package:loan_app/services/auth_service.dart';
 import 'package:loan_app/services/notification_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class FirestoreService {
   final NotificationService _notificationService = NotificationService();
@@ -407,6 +406,77 @@ class FirestoreService {
       await _db.collection(_losnCollection).doc(id).delete();
     } catch (e) {
       print(e);
+    }
+  }
+
+  // Function to get the total invested amount for a lender
+  Future<double> getTotalInvestedAmount(String lenderId) async {
+    try {
+      QuerySnapshot loansSnapshot = await _db
+          .collection(_losnCollection)
+          .where('lenderId', isEqualTo: lenderId)
+          .get();
+
+      double totalInvestedAmount = 0;
+
+      for (QueryDocumentSnapshot loanDoc in loansSnapshot.docs) {
+        // Calculate and add the loan amount to the total invested amount
+        double loanAmount = loanDoc.get('amount');
+        totalInvestedAmount += loanAmount;
+      }
+
+      return totalInvestedAmount;
+    } catch (e) {
+      print(e);
+      return 0.0; // Return 0 in case of an error
+    }
+  }
+
+  // // Function to get the total interest earned for a lender
+  // Future<double> getTotalInterestEarned(String lenderId) async {
+  //   try {
+  //     QuerySnapshot transactionsSnapshot = await _db
+  //         .collection(_transactionCollection)
+  //         .where('lenderId', isEqualTo: lenderId)
+  //         .get();
+
+  //     double totalIntrestEarned = 0;
+
+  //     for (QueryDocumentSnapshot transactionDoc in transactionsSnapshot.docs) {
+  //       // Calculate and add the principal earned to the total principal earned get amoutn where transaction
+  //       double principalEarned = transactionDoc.get('amount');
+  //       totalIntrestEarned += principalEarned;
+  //     }
+
+  //     return totalIntrestEarned;
+  //   } catch (e) {
+  //     print(e);
+  //     return 0.0; // Return 0 in case of an error
+  //   }
+  // }
+
+  Future<double> getTotalInterestEarned(String lenderId) async {
+    try {
+      QuerySnapshot transactionsSnapshot = await _db
+          .collection(_transactionCollection)
+          .where('lenderId', isEqualTo: lenderId)
+          .get();
+
+      double totalInterestEarned = 0;
+
+      for (QueryDocumentSnapshot transactionDoc in transactionsSnapshot.docs) {
+        String transactionType = transactionDoc.get('transactionType');
+        if (transactionType == 'interest') {
+          // If the transaction type is 'interest', add the amount to the total interest earned
+          double interestAmount = transactionDoc.get('amount');
+          totalInterestEarned += interestAmount;
+        }
+      }
+
+      return totalInterestEarned;
+    } catch (e) {
+      print(e);
+      return 0.0; // Return 0 in case of an error
     }
   }
 
