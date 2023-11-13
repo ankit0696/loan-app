@@ -148,39 +148,7 @@ class _AllTransactionsState extends State<AllTransactions> {
                         backgroundImage: NetworkImage(
                             "https://avatars.githubusercontent.com/u/61448739?v=4"),
                       ),
-                      title: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(formatAmount(transaction.amount),
-                                  style: const TextStyle(
-                                      fontSize: 15, color: Colors.black)),
-                              Container(
-                                margin: const EdgeInsets.only(left: 5.0),
-                                padding: const EdgeInsets.all(2.0),
-                                decoration: BoxDecoration(
-                                  color:
-                                      transaction.transactionType == "principal"
-                                          ? Colors.green.shade200
-                                          : Colors.blue.shade200,
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                                child: Text(transaction.transactionType,
-                                    style: const TextStyle(
-                                        fontSize: 10, color: Colors.black)),
-                              )
-                            ],
-                          ),
-                          Text(
-                              transaction.dueDate
-                                  .toIso8601String()
-                                  .split("T")[0],
-                              style: const TextStyle(
-                                  fontSize: 12, color: Colors.grey)),
-                        ],
-                      ),
+                      title: transactionCard(transaction),
                       subtitle: Text(transaction.description ?? "",
                           style: const TextStyle(
                               fontSize: 12, color: Colors.grey)),
@@ -201,6 +169,35 @@ class _AllTransactionsState extends State<AllTransactions> {
             },
           );
         });
+  }
+
+  Column transactionCard(TransactionModel transaction) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(formatAmount(transaction.amount),
+                style: const TextStyle(fontSize: 15, color: Colors.black)),
+            Container(
+              margin: const EdgeInsets.only(left: 5.0),
+              padding: const EdgeInsets.all(2.0),
+              decoration: BoxDecoration(
+                color: transaction.transactionType == "principal"
+                    ? Colors.green.shade200
+                    : Colors.blue.shade200,
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              child: Text(transaction.transactionType,
+                  style: const TextStyle(fontSize: 10, color: Colors.black)),
+            )
+          ],
+        ),
+        Text(transaction.dueDate.toIso8601String().split("T")[0],
+            style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      ],
+    );
   }
 
   Container background(BuildContext context, double sizeHeight) {

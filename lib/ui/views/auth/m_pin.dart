@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loan_app/services/auth_service.dart';
 import 'package:loan_app/services/firestore_service.dart';
 import 'package:loan_app/ui/views/home.dart';
 import 'package:loan_app/ui/widgets/app_background.dart';
@@ -26,6 +27,7 @@ class _MPINScreenState extends State<MPINScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+             const Spacer(),
               Form(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -87,6 +89,13 @@ class _MPINScreenState extends State<MPINScreen> {
               ),
               const SizedBox(height: 20),
               errorText(_verificationStatus),
+             const Spacer(),
+              InkWell(
+                onTap: () {
+                  AuthService().signOut(context);
+                },
+                child: errorText("Logout")),
+              const SizedBox(height: 20),
             ],
           ),
         ),

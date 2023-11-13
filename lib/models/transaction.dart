@@ -9,6 +9,7 @@ class TransactionModel {
   final String lenderId;
   final String? description;
   final String transactionType;
+  final String rawAmount;
 
   TransactionModel({
     required this.id,
@@ -21,6 +22,7 @@ class TransactionModel {
     required this.lenderId,
     required this.description,
     required this.transactionType,
+    required this.rawAmount,
   });
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class TransactionModel {
       lenderId: json['lenderId'],
       description: json['description'],
       transactionType: json['transactionType'],
+      rawAmount: json['rawAmount'].toString(),
     );
   }
 
@@ -50,6 +53,7 @@ class TransactionModel {
       'lenderId': lenderId,
       'description': description,
       'transactionType': transactionType,
+      'rawAmount': rawAmount,
     };
   }
 }

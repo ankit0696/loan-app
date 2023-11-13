@@ -56,30 +56,30 @@ class TransactionForm extends StatelessWidget {
       List<QueryDocumentSnapshot<Object?>> docs) {
     TransactionModel? lastTransaction;
     List<TransactionModel> transactions = [];
-    for (var doc in docs) {
-      TransactionModel transaction =
-          TransactionModel.fromJson(doc.data() as Map<String, dynamic>);
-      print('transaction ${transaction.amount}');
-      if (transaction.transactionType == 'interest') {
-        print('transaction iiiii ${transaction.amount}');
-        if (lastTransaction == null) {
-          lastTransaction = transaction;
-        } else {
-          if (transaction.dueDate.isAfter(lastTransaction.dueDate)) {
-            lastTransaction = transaction;
-          }
-        }
-      }
-    }
+    // for (var doc in docs) {
+    //   TransactionModel transaction =
+    //       TransactionModel.fromJson(doc.data() as Map<String, dynamic>);
+    //   print('transaction ${transaction.amount}');
+    //   if (transaction.transactionType == 'interest') {
+    //     print('transaction iiiii ${transaction.amount}');
+    //     if (lastTransaction == null) {
+    //       lastTransaction = transaction;
+    //     } else {
+    //       if (transaction.dueDate.isAfter(lastTransaction.dueDate)) {
+    //         lastTransaction = transaction;
+    //       }
+    //     }
+    //   }
+    // }
     print('last transaction ${lastTransaction?.amount}');
 
     for (var doc in docs) {
       TransactionModel transaction =
           TransactionModel.fromJson(doc.data() as Map<String, dynamic>);
       if (transaction.transactionType == 'interest') {
-        if (transaction.dueDate == lastTransaction!.dueDate) {
+        // if (transaction.dueDate == lastTransaction!.dueDate) {
           transactions.add(transaction);
-        }
+        // }
       }
     }
     // print('last transaction ${lastTransaction?.amount}');
@@ -103,6 +103,7 @@ class _TransactionState extends State<Transaction> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
+  String amountCopy = '';
   late DateTime _dueDate;
   late String _transactionType;
   double totalIntrest = 0.0;
@@ -195,6 +196,7 @@ class _TransactionState extends State<Transaction> {
   }
 
   void _submitConfirmedForm() {
+    amountCopy = _amountController.text;
     if (widget.lastTransaction != null) {
       totalIntrest = calculateTotalIntrest(widget.lastTransaction);
     }
@@ -202,15 +204,17 @@ class _TransactionState extends State<Transaction> {
 
     FirestoreService().addTransaction(transactions).then((value) {
       if (value == 'success') {
-        customSnackbar(
-          message: 'Transaction added successfully',
-          context: context,
-        );
+        // customSnackbar(
+        //   message: 'Transaction added successfully',
+        //   context: context,
+        // );
+        print("Transaction added successfully");
       } else {
-        customSnackbar(
-          message: 'Something went wrong',
-          context: context,
-        );
+        // customSnackbar(
+        //   message: 'Something went wrong',
+        //   context: context,
+        // );
+        print("Something went wrong");
       }
     }).catchError(
       // ignore: invalid_return_type_for_catch_error
@@ -237,44 +241,27 @@ class _TransactionState extends State<Transaction> {
     double interest = widget.loan.interestRate;
     double interestAmount = principal * (interest / 100);
 
-    if (_transactionType == 'interest') {
-      double amountLeft = amount;
+    if (_transactionType.contains('interest')) {
+      // total intrest paid till date
+      double totalIntrestPaidTillDate =
+          calculateTotalInterestPaid(widget.lastTransaction ?? []);
 
-      // if the last transaction interest is less than the interest amount then add the difference to the new transaction and then add the new transaction
-      if (widget.lastTransaction != null && totalIntrest < interestAmount) {
-        double difference = interestAmount - totalIntrest;
-        // check if the amountLeft is greater than the difference
-        if (amountLeft > difference) {
-          amountLeft -= difference;
+      // how many monnths paid till now
+      // TODO: check if principal and interest rate is never zero
+      int monthsPaidTillNow = totalIntrestPaidTillDate ~/ interestAmount;
 
-          transactions.add(TransactionModel(
-            id: '',
-            amount: difference,
-            date: DateTime.now(),
-            createdDate: DateTime.now(),
-            dueDate: _dueDate,
-            borrowerId: widget.loan.borrowerId,
-            loanId: widget.loan.id,
-            lenderId: widget.loan.lenderId,
-            description: _descriptionController.text.isNotEmpty
-                ? _descriptionController.text
-                : null,
-            transactionType: _transactionType,
-          ));
-          // increate due date by 1 month
-          _dueDate = _dueDate.month < 12
-              ? DateTime(_dueDate.year, _dueDate.month + 1, _dueDate.day)
-              : DateTime(_dueDate.year + 1, 1, _dueDate.day);
-        }
-      } else {
-        // diew date +1
-        _dueDate = _dueDate.month < 12
-            ? DateTime(_dueDate.year, _dueDate.month + 1, _dueDate.day)
-            : DateTime(_dueDate.year + 1, 1, _dueDate.day);
+      double remainingInterest = totalIntrestPaidTillDate - (interestAmount * monthsPaidTillNow);
 
+      // update due date to months paid till now + 1
+      _dueDate = widget.loan.date.month < 12
+          ? DateTime(widget.loan.date.year, widget.loan.date.month + monthsPaidTillNow + 1,
+              widget.loan.date.day)
+          : DateTime(widget.loan.date.year + 1, 1, widget.loan.date.day);
+
+      double transactionAmount = interestAmount - remainingInterest;
         transactions.add(TransactionModel(
           id: '',
-          amount: interestAmount,
+          amount: amount < transactionAmount ? amount : transactionAmount,
           date: DateTime.now(),
           createdDate: DateTime.now(),
           dueDate: _dueDate,
@@ -285,48 +272,41 @@ class _TransactionState extends State<Transaction> {
               ? _descriptionController.text
               : null,
           transactionType: _transactionType,
+          rawAmount: amountCopy,
         ));
-      }
 
-      while (amountLeft > interestAmount) {
-        amountLeft -= interestAmount;
-        transactions.add(
-          TransactionModel(
-            id: '',
-            amount: interestAmount,
-            date: DateTime.now(),
-            createdDate: DateTime.now(),
-            dueDate: _dueDate,
-            borrowerId: widget.loan.borrowerId,
-            loanId: widget.loan.id,
-            lenderId: widget.loan.lenderId,
-            description: _descriptionController.text.isNotEmpty
-                ? _descriptionController.text
-                : null,
-            transactionType: _transactionType,
-          ),
-        );
+
+      double remainingAmount = amount - transactionAmount;
+      while (remainingAmount > 0) {
         // increate due date by 1 month
         _dueDate = _dueDate.month < 12
             ? DateTime(_dueDate.year, _dueDate.month + 1, _dueDate.day)
             : DateTime(_dueDate.year + 1, 1, _dueDate.day);
+
+        // add transaction
+        transactions.add(TransactionModel(
+          id: '',
+          amount: remainingAmount > interestAmount ? interestAmount : remainingAmount,
+          date: DateTime.now(),
+          createdDate: DateTime.now(),
+          dueDate: _dueDate,
+          borrowerId: widget.loan.borrowerId,
+          loanId: widget.loan.id,
+          lenderId: widget.loan.lenderId,
+          description: _descriptionController.text.isNotEmpty
+              ? _descriptionController.text
+              : null,
+          transactionType: _transactionType,
+          rawAmount: amountCopy,
+        ));
+
+        remainingAmount -= interestAmount;
       }
-      transactions.add(TransactionModel(
-        id: '',
-        amount: amountLeft,
-        date: DateTime.parse(_dateController.text),
-        createdDate: DateTime.now(),
-        dueDate: _dueDate,
-        borrowerId: widget.loan.borrowerId,
-        loanId: widget.loan.id,
-        lenderId: widget.loan.lenderId,
-        description: _descriptionController.text.isNotEmpty
-            ? _descriptionController.text
-            : null,
-        transactionType: _transactionType,
-      ));
+
+
+
+
     } else {
-      // @TODO: Check for intrest due date and add the transaction to that month and then add in principal
 
       transactions.add(TransactionModel(
         id: '',
@@ -341,9 +321,22 @@ class _TransactionState extends State<Transaction> {
             ? _descriptionController.text
             : null,
         transactionType: _transactionType,
+        rawAmount: amountCopy,
       ));
     }
     return transactions;
+  }
+
+
+// total intrest paid till date
+  double calculateTotalInterestPaid(List<TransactionModel> transactions) {
+    double totalInterestPaid = 0.0;
+    for (TransactionModel transaction in transactions) {
+      if (transaction.transactionType == "interest") {
+        totalInterestPaid += transaction.amount;
+      }
+    }
+    return totalInterestPaid;
   }
 
   @override

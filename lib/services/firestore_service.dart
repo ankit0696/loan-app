@@ -215,6 +215,14 @@ class FirestoreService {
     }
   }
 
+  // delete transaction 
+  Future<void> deleteTransaction(String transactionId) async {
+    try {
+      await _db.collection(_transactionCollection).doc(transactionId).delete();
+    } catch (e) {
+      print(e);
+    }
+  }
   // get transaction data
   Stream<QuerySnapshot> getTransactions(String loanId, String borrowerId) {
     try {
@@ -415,6 +423,7 @@ class FirestoreService {
       QuerySnapshot loansSnapshot = await _db
           .collection(_losnCollection)
           .where('lenderId', isEqualTo: lenderId)
+          .where('isActive', isEqualTo: true)
           .get();
 
       double totalInvestedAmount = 0;
@@ -518,4 +527,23 @@ class FirestoreService {
 //     final DocumentReference ref = _db.doc(path);
 //     return ref.snapshots();
 //   }
+
+ final CollectionReference transactionsRef =
+      FirebaseFirestore.instance.collection('transactions');
+
+// to update any thing in all properties use this function
+  Future<void> updateAllTransactions() async {
+  try {
+    QuerySnapshot querySnapshot = await transactionsRef.get();
+    List<QueryDocumentSnapshot> documents = querySnapshot.docs;
+
+    for (QueryDocumentSnapshot document in documents) {
+      // Update each document with the new field
+      await transactionsRef.doc(document.id).update({'rawAmount': 'NA'});
+    }
+  } on FirebaseException catch (e) {
+    print(e);
+    throw e;
+  }
+}
 }

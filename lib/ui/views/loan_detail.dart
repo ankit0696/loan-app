@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:loan_app/models/loan.dart';
 import 'package:loan_app/models/transaction.dart';
 import 'package:loan_app/services/firestore_service.dart';
@@ -246,10 +247,16 @@ class _LoanState extends State<Loan> {
             itemBuilder: (context, index) {
               TransactionModel transaction = TransactionModel.fromJson(
                   snapshot.data!.docs[index].data() as Map<String, dynamic>);
+                  print('transaction ${transaction.rawAmount}');
               return ListTile(
-                leading: const CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "https://avatars.githubusercontent.com/u/61448739?v=4"),
+                leading: InkWell(
+                  onTap: () {
+                    // FirestoreService().deleteTransaction(transaction.id);
+                  },
+                  child: const CircleAvatar(
+                    backgroundImage: NetworkImage(
+                        "https://avatars.githubusercontent.com/u/61448739?v=4"),
+                  ),
                 ),
                 title: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -278,6 +285,9 @@ class _LoanState extends State<Loan> {
                     Text(transaction.dueDate.toIso8601String().split("T")[0],
                         style:
                             const TextStyle(fontSize: 12, color: Colors.grey)),
+                    Text("Orignal Amount: ${transaction.id}",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey)),
                   ],
                 ),
                 subtitle: Text(transaction.description ?? "",
@@ -290,10 +300,7 @@ class _LoanState extends State<Loan> {
                         style:
                             const TextStyle(color: Colors.grey, fontSize: 12)),
                     Text(
-                        transaction.date
-                            .toIso8601String()
-                            .split("T")[1]
-                            .split(".")[0],
+                        DateFormat('h:mm a').format(transaction.date),
                         style:
                             const TextStyle(color: Colors.grey, fontSize: 12)),
                   ],
