@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:loan_app/models/user.dart';
 import 'package:loan_app/services/auth_service.dart';
@@ -42,19 +43,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
         return;
       }
 
-      AuthService().registerWithEmailAndPassword(email, password).then((value) {
+      AuthService().registerWithEmailAndPassword(email, password).then((value) async{
         if (value == 'success') {
           final user = UserModel(
             name: name,
             email: email,
             id: AuthService().user.uid,
+            fcmToken:await AuthService().getFCMToken() ?? '', 
           );
           FirestoreService().addUser(user);
           setState(() {
             _loading = false;
           });
           Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const HomePage()));
+              MaterialPageRoute(builder: (context) =>  const HomePage()));
         } else {
           customSnackbar(message: 'Sign up failed', context: context);
           setState(() {

@@ -210,7 +210,7 @@ class _HomeShimmerState extends State<HomeShimmer> {
 
   Widget transactions() {
     return ListView.builder(
-      physics: const BouncingScrollPhysics(),
+      // physics: const BouncingScrollPhysics(),
       itemCount: 10,
       itemBuilder: (context, index) {
         return ListTile(

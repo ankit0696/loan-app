@@ -121,14 +121,21 @@ class _HomeState extends State<Home> {
   double totalInvestedAmount = 0;
   double totalInterestEarned = 0;
   double totalPrincipalEarned = 0;
+  double totalIntrestEarnedThisMonth = 0;
+  double totalPrincipalEarnedThisMonth = 0;
 
   @override
   void initState() {
     notificationService.getNotificationPermission();
-    notificationService.initializeNotification();
     fetchFinancialInformation();
-
+    updateFcmToken();
     super.initState();
+  }
+
+  // update FCM Token if different
+  Future<void> updateFcmToken() async {
+    print("This is step one");
+    FirestoreService().updateFCMTokenIfDifferent();
   }
 
   Future<void> fetchFinancialInformation() async {
@@ -137,6 +144,9 @@ class _HomeState extends State<Home> {
         await FirestoreService().getTotalInvestedAmount(lenderId);
     totalInterestEarned =
         await FirestoreService().getTotalInterestEarned(lenderId);
+        totalIntrestEarnedThisMonth = await FirestoreService().getTotalInterestEarnedThisMonth(lenderId);
+
+
     // totalPrincipalEarned =
     //     await FirestoreService().getTotalPrincipalEarned(lenderId);
     setState(() {
@@ -241,10 +251,56 @@ class _HomeState extends State<Home> {
                         fontSize: 20.0,
                         color: Colors.white,
                       ),
-                      const Header(
-                          title: "Welcome Back!",
-                          fontSize: 20.0,
-                          color: Colors.black),
+                      Row(
+                        children: [
+                          const Header(
+                              title: "Welcome Back!",
+                              fontSize: 20.0,
+                              color: Colors.black),
+                          // make a small i icon
+                          IconButton(
+                            onPressed: () async {
+                              fetchFinancialInformation().then((value) => 
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Financial Information'),
+                                    content: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        _financialInformationCard(
+                                            "Invested Amount",
+                                            totalInvestedAmount),
+                                        _financialInformationCard(
+                                            "Interest Earned",
+                                            totalInterestEarned),
+                                        _financialInformationCard(
+                                            "Current Month Intrest",
+                                            totalIntrestEarnedThisMonth )
+                                        // Add other financial information cards as needed
+                                      ],
+                                    ),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('Close'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              )
+                              );
+                            },
+                            icon: const Icon(Icons.info_rounded),
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ],
@@ -278,14 +334,14 @@ class _HomeState extends State<Home> {
               ),
             ],
           ),
-          Column(
-            children: [
-              _financialInformationCard("Invested Amount", totalInvestedAmount),
-              _financialInformationCard("Interest Earned", totalInterestEarned),
-              // _financialInformationCard(
-              //     "Principal Earned", totalPrincipalEarned),
-            ],
-          )
+          // Column(
+          //   children: [
+          //     _financialInformationCard("Invested Amount", totalInvestedAmount),
+          //     _financialInformationCard("Interest Earned", totalInterestEarned),
+          //     // _financialInformationCard(
+          //     //     "Principal Earned", totalPrincipalEarned),
+          //   ],
+          // )
         ],
       ),
     );
@@ -491,7 +547,7 @@ class _HomeState extends State<Home> {
           }
 
           return ListView.builder(
-            physics: const BouncingScrollPhysics(),
+            // physics: const BouncingScrollPhysics(),
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
               TransactionModel transaction = TransactionModel.fromJson(

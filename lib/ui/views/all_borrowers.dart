@@ -120,7 +120,7 @@ class _AllBorrowersState extends State<AllBorrowers> {
           }
 
           return ListView.builder(
-            physics: const BouncingScrollPhysics(),
+            // physics: const BouncingScrollPhysics(),
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
               BorrowerModel borrower = BorrowerModel.fromJson(

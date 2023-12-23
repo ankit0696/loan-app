@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:loan_app/services/firestore_service.dart';
+import 'package:loan_app/services/notification_service.dart';
 import 'package:loan_app/ui/views/auth/m_pin.dart';
 import 'package:loan_app/ui/views/bording_screen/bording_screen.dart';
 import 'package:loan_app/ui/views/home.dart';
@@ -22,6 +23,7 @@ class _AuthCheckState extends State<AuthCheck> {
   Future<dynamic> initializeApp() async {
     await Future.delayed(const Duration(seconds: 2), () {});
     FirebaseApp snapshot = await _initialization;
+    NotificationService().initialise();
     return Future.value(true);
   }
 

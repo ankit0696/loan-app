@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:loan_app/models/loan.dart';
 import 'package:loan_app/models/notification.dart';
@@ -6,7 +9,23 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+Future<void> handleBackgroundMessage(RemoteMessage message) async {
+  print("title: ${message.notification?.title}");
+  print("body: ${message.notification?.body}");
+}
+
 class NotificationService {
+   final _firebaseMessaging = FirebaseMessaging.instance;
+
+   final _android = const AndroidNotificationDetails(
+    'loan_app',
+    'Loan App',
+    importance: Importance.high,
+    priority: Priority.high,
+    playSound: true,
+    channelDescription: 'Loan App', 
+  );
+   
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -50,6 +69,34 @@ class NotificationService {
       // save permission asked
       prefs.setBool('notification_permission_asked', true);
     }
+  }
+
+  // initilize notification
+  Future<void> initialise() async {
+    await _firebaseMessaging.requestPermission();
+    String? fcmToken = await _firebaseMessaging.getToken();
+    print("FCM Token: $fcmToken");
+
+     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+    FirebaseMessaging.onMessage.listen((message) {
+      final notification = message.notification;
+      if (notification == null) return;
+      flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _android.channelId,
+            _android.channelName,
+            channelDescription: _android.channelDescription,
+            icon: 'app_logo',
+          ),
+        ),
+        payload: jsonEncode(message.toMap()),
+      );
+    });
+    initializeNotification();
   }
 
   // initialize notification
@@ -148,8 +195,8 @@ class NotificationService {
       );
 
       await flutterLocalNotificationsPlugin.zonedSchedule(
-        notificationCount++,
-        title! + initialTime.toString(),
+        notificationCount.hashCode,
+        title! + initialTime.toIso8601String(),
         body,
         tz.TZDateTime.from(initialTime, tz.local),
         await notificationDetails(),
@@ -158,6 +205,7 @@ class NotificationService {
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time,
       );
+      notificationCount++;                                
 
       // Calculate the time for the next month (1 month later), considering year change
       int nextMonth = initialTime.month + 1;
@@ -176,8 +224,10 @@ class NotificationService {
         0, // Set the minute to 0 (on the hour)
       );
 
-      print("yes");
+      print("yes $notificationCount");
     }
+
+    print("Test ing");
   }
 
   // Cancel a specific notification by ID

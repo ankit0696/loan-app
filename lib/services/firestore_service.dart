@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loan_app/models/borrower.dart';
@@ -215,7 +216,7 @@ class FirestoreService {
     }
   }
 
-  // delete transaction 
+  // delete transaction
   Future<void> deleteTransaction(String transactionId) async {
     try {
       await _db.collection(_transactionCollection).doc(transactionId).delete();
@@ -223,6 +224,7 @@ class FirestoreService {
       print(e);
     }
   }
+
   // get transaction data
   Stream<QuerySnapshot> getTransactions(String loanId, String borrowerId) {
     try {
@@ -344,17 +346,19 @@ class FirestoreService {
 
   // delete image from firebase storage from image link
   Future<void> deleteImageFromFirebase(String imageUrl) async {
-    try {
-      // Parse the download URL to a reference
-      final ref = FirebaseStorage.instance.refFromURL(imageUrl);
+    if (kDebugMode) {
+      try {
+        // Parse the download URL to a reference
+        final ref = FirebaseStorage.instance.refFromURL(imageUrl);
 
-      // Delete the file
-      await ref.delete();
+        // Delete the file
+        await ref.delete();
 
-      print("Image deleted successfully");
-    } catch (e) {
-      print("Error deleting image: $e");
-      throw e;
+        print("Image deleted successfully");
+      } catch (e) {
+        print("Error deleting image: $e");
+        throw e;
+      }
     }
   }
 
@@ -417,6 +421,25 @@ class FirestoreService {
     }
   }
 
+  // delete all trancation of thsi lender
+  Future<void> deleteTransactionOfCurrentLender(String lenderId) async {
+    if (kDebugMode) {
+      try {
+        await _db
+            .collection(_transactionCollection)
+            .where('lenderId', isEqualTo: lenderId)
+            .get()
+            .then((value) {
+          for (QueryDocumentSnapshot doc in value.docs) {
+            _db.collection(_transactionCollection).doc(doc.id).delete();
+          }
+        });
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
   // Function to get the total invested amount for a lender
   Future<double> getTotalInvestedAmount(String lenderId) async {
     try {
@@ -435,6 +458,37 @@ class FirestoreService {
       }
 
       return totalInvestedAmount;
+    } catch (e) {
+      print(e);
+      return 0.0; // Return 0 in case of an error
+    }
+  }
+
+  Future<double> getTotalInterestEarnedThisMonth(String lenderId) async {
+    try {
+      DateTime now = DateTime.now();
+      DateTime firstDayOfMonth = DateTime(now.year, now.month, 1);
+      DateTime lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
+
+      QuerySnapshot transactionsSnapshot = await FirebaseFirestore.instance
+          .collection(_transactionCollection)
+          .where('lenderId', isEqualTo: lenderId)
+          .where('transactionType', isEqualTo: 'interest')
+          .get();
+
+      double totalInterestEarnedThisMonth = 0;
+
+      for (QueryDocumentSnapshot transactionDoc in transactionsSnapshot.docs) {
+        double interestAmount = transactionDoc.get('amount');
+        String dateString = transactionDoc.get('date').toString();
+        DateTime transactionDate = DateTime.parse(dateString);
+        if (transactionDate.isAfter(firstDayOfMonth) &&
+            transactionDate.isBefore(lastDayOfMonth)) {
+          totalInterestEarnedThisMonth += interestAmount;
+        }
+      }
+
+      return totalInterestEarnedThisMonth;
     } catch (e) {
       print(e);
       return 0.0; // Return 0 in case of an error
@@ -528,22 +582,61 @@ class FirestoreService {
 //     return ref.snapshots();
 //   }
 
- final CollectionReference transactionsRef =
+  final CollectionReference transactionsRef =
       FirebaseFirestore.instance.collection('transactions');
 
 // to update any thing in all properties use this function
   Future<void> updateAllTransactions() async {
-  try {
-    QuerySnapshot querySnapshot = await transactionsRef.get();
-    List<QueryDocumentSnapshot> documents = querySnapshot.docs;
+    try {
+      QuerySnapshot querySnapshot = await transactionsRef.get();
+      List<QueryDocumentSnapshot> documents = querySnapshot.docs;
 
-    for (QueryDocumentSnapshot document in documents) {
-      // Update each document with the new field
-      await transactionsRef.doc(document.id).update({'rawAmount': 'NA'});
+      for (QueryDocumentSnapshot document in documents) {
+        // Update each document with the new field
+        await transactionsRef.doc(document.id).update({'rawAmount': 'NA'});
+      }
+    } on FirebaseException catch (e) {
+      print(e);
+      throw e;
     }
-  } on FirebaseException catch (e) {
-    print(e);
-    throw e;
   }
-}
+
+  // update fcm token of current user
+  Future<String> updateFCMToken() async {
+    print("This is step four");
+
+    try {
+      String uid = AuthService().user.uid;
+      await _db.collection(_userCollection).doc(uid).update({
+        'fcmToken': await AuthService().getFCMToken(),
+      });
+      return 'success';
+    } catch (e) {
+      print(e);
+      return e.toString();
+    }
+  }
+
+  void updateFCMTokenIfDifferent() async {
+    print("This is step two");
+
+    try {
+      // get current user data
+      DocumentSnapshot userSnapshot = await _db
+          .collection(_userCollection)
+          .doc(AuthService().user.uid)
+          .get();
+
+      if (userSnapshot.exists) {
+        String fcmToken = userSnapshot.get('fcmToken');
+        String? newFcmToken = await AuthService().getFCMToken();
+
+        if (fcmToken != newFcmToken) {
+          updateFCMToken();
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 }

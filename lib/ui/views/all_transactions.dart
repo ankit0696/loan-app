@@ -123,7 +123,7 @@ class _AllTransactionsState extends State<AllTransactions> {
           }
 
           return ListView.builder(
-            physics: const BouncingScrollPhysics(),
+            // physics: const BouncingScrollPhysics(),
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
               TransactionModel transaction = TransactionModel.fromJson(

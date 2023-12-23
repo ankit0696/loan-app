@@ -60,10 +60,17 @@ class AccountPage extends StatelessWidget {
   }
 }
 
-class Account extends StatelessWidget {
+class Account extends StatefulWidget {
   final BorrowerModel borrower;
   const Account({super.key, required this.borrower});
 
+  @override
+  State<Account> createState() => _AccountState();
+}
+
+class _AccountState extends State<Account> {
+
+  bool isExpanded = false;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -77,7 +84,7 @@ class Account extends StatelessWidget {
   Stream<QuerySnapshot> get stream => getLoans();
 
   Stream<QuerySnapshot> getLoans() {
-    return FirestoreService().getLoans(borrower.id);
+    return FirestoreService().getLoans(widget.borrower.id);
   }
 
   SingleChildScrollView bodyWidget(BuildContext context) {
@@ -107,7 +114,7 @@ class Account extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => BorrowForm(id: borrower.id),
+                            builder: (context) => BorrowForm(id: widget.borrower.id),
                           ),
                         );
                       },
@@ -141,18 +148,18 @@ class Account extends StatelessWidget {
                     ),
                     const SizedBox(height: 20.0),
                     Header(
-                      title: borrower.name,
+                      title: widget.borrower.name,
                       fontSize: 16,
                       color: Colors.white,
                     ),
                     InkWell(
                       onTap: () {
-                        Clipboard.setData(ClipboardData(text: borrower.phone));
+                        Clipboard.setData(ClipboardData(text: widget.borrower.phone));
                         customSnackbar(
                             message: "Copied to Clipboard", context: context);
                       },
                       child: Header(
-                        title: borrower.phone,
+                        title: widget.borrower.phone,
                         color: Colors.white,
                         fontSize: 16,
                       ),
@@ -208,28 +215,59 @@ class Account extends StatelessWidget {
 
   Widget extraDetails(BuildContext context) {
     return Column(children: [
-      textField(
-        keyboardType: TextInputType.none,
-        label: "Aadhar Number",
-        hint: borrower.aadharNumber,
-        disabled: true,
-        icon: Icons.copy,
-        onIconTap: () {
-          Clipboard.setData(ClipboardData(text: borrower.aadharNumber));
-          customSnackbar(message: "Aadhar Copied", context: context);
-        },
-      ),
-      textField(
-        keyboardType: TextInputType.none,
-        label: "Address",
-        hint: borrower.address,
-        disabled: true,
-        icon: Icons.location_on_outlined,
-        onIconTap: () {
-          Clipboard.setData(ClipboardData(text: borrower.address));
-          customSnackbar(message: "Address copied", context: context);
-        },
-      ),
+      ExpansionPanelList(
+          expansionCallback: (int index, bool isExpanded) {
+            setState(() {
+              this.isExpanded = !this.isExpanded;
+            });
+          },
+          children: [
+            ExpansionPanel(
+                canTapOnHeader: true,
+                backgroundColor: isExpanded ? Colors.white: const Color(0xFFE7B60B),
+                isExpanded: isExpanded,                
+                headerBuilder: (BuildContext context, bool isExpanded) {
+                  return const Center(
+                    child:  Header(
+                      title: "Personal Details",
+                    ),
+                  );
+                },
+                body: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Column(
+                    children: [
+                      textField(
+                        keyboardType: TextInputType.none,
+                        label: "Aadhar Number",
+                        hint: widget.borrower.aadharNumber,
+                        disabled: true,
+                        icon: Icons.copy,
+                        onIconTap: () {
+                          Clipboard.setData(
+                              ClipboardData(text: widget.borrower.aadharNumber));
+                          customSnackbar(
+                              message: "Aadhar Copied", context: context);
+                        },
+                      ),
+                      textField(
+                        keyboardType: TextInputType.none,
+                        label: "Address",
+                        hint: widget.borrower.address,
+                        disabled: true,
+                        icon: Icons.location_on_outlined,
+                        onIconTap: () {
+                          Clipboard.setData(
+                              ClipboardData(text: widget.borrower.address));
+                          customSnackbar(
+                              message: "Address copied", context: context);
+                        },
+                      ),
+                    ],
+                  ),
+                ))
+          ]),
+
       const SizedBox(height: 30.0),
       const Header(title: "Loans", fontSize: 20.0),
       Expanded(
@@ -254,7 +292,7 @@ class Account extends StatelessWidget {
         // }
         return ListView.builder(
           shrinkWrap: true,
-          physics: const BouncingScrollPhysics(),
+          // physics: const BouncingScrollPhysics(),
           itemCount: snapshot.data!.docs.length + 1,
           itemBuilder: (context, index) {
             if (index == snapshot.data!.docs.length) {
@@ -365,8 +403,8 @@ class Account extends StatelessWidget {
             context,
             MaterialPageRoute(
                 builder: (context) => LoanForm(
-                      borrowerId: borrower.id,
-                      borrowerName: borrower.name,
+                      borrowerId: widget.borrower.id,
+                      borrowerName: widget.borrower.name,
                     )));
       },
       child: Container(
