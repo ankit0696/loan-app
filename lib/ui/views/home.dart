@@ -144,8 +144,8 @@ class _HomeState extends State<Home> {
         await FirestoreService().getTotalInvestedAmount(lenderId);
     totalInterestEarned =
         await FirestoreService().getTotalInterestEarned(lenderId);
-        totalIntrestEarnedThisMonth = await FirestoreService().getTotalInterestEarnedThisMonth(lenderId);
-
+    totalIntrestEarnedThisMonth =
+        await FirestoreService().getTotalInterestEarnedThisMonth(lenderId);
 
     // totalPrincipalEarned =
     //     await FirestoreService().getTotalPrincipalEarned(lenderId);
@@ -258,43 +258,107 @@ class _HomeState extends State<Home> {
                               fontSize: 20.0,
                               color: Colors.black),
                           // make a small i icon
+                          // IconButton(
+                          //   onPressed: () async {
+                          //     fetchFinancialInformation()
+                          //         .then((value) => showDialog(
+                          //               context: context,
+                          //               builder: (BuildContext context) {
+                          //                 // return AlertDialog(
+                          //                 //   title: const Text('Financial Information'),
+                          //                 //   content: Column(
+                          //                 //     crossAxisAlignment:
+                          //                 //         CrossAxisAlignment.start,
+                          //                 //     mainAxisSize: MainAxisSize.min,
+                          //                 //     children: [
+                          //                 //       _financialInformationCard(
+                          //                 //           "Invested Amount",
+                          //                 //           totalInvestedAmount),
+                          //                 //       _financialInformationCard(
+                          //                 //           "Interest Earned",
+                          //                 //           totalInterestEarned),
+                          //                 //       _financialInformationCard(
+                          //                 //           "Current Month Intrest",
+                          //                 //           totalIntrestEarnedThisMonth )
+                          //                 //       // Add other financial information cards as needed
+                          //                 //     ],
+                          //                 //   ),
+                          //                 //   actions: <Widget>[
+                          //                 //     ElevatedButton(
+                          //                 //       onPressed: () {
+                          //                 //         Navigator.of(context).pop();
+                          //                 //       },
+                          //                 //       child: const Text('Close'),
+                          //                 //     ),
+                          //                 //   ],
+                          //                 // );
+
+                          //               },
+                          //             ));
+                          //   },
+                          //   icon: const Icon(Icons.info_rounded),
+                          //   color: Colors.white,
+                          // ),
                           IconButton(
                             onPressed: () async {
-                              fetchFinancialInformation().then((value) => 
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Financial Information'),
-                                    content: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        _financialInformationCard(
-                                            "Invested Amount",
-                                            totalInvestedAmount),
-                                        _financialInformationCard(
-                                            "Interest Earned",
-                                            totalInterestEarned),
-                                        _financialInformationCard(
-                                            "Current Month Intrest",
-                                            totalIntrestEarnedThisMonth )
-                                        // Add other financial information cards as needed
-                                      ],
+                              fetchFinancialInformation().then((value) {
+                                showModalBottomSheet(
+                                  showDragHandle: true,
+                                  useRootNavigator: true,
+                                  useSafeArea: true,
+                                  elevation: 8.0,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20.0),
+                                      topRight: Radius.circular(20.0),
                                     ),
-                                    actions: <Widget>[
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text('Close'),
+                                  ),
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.45,
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Header(
+                                                title: "Financial Information",
+                                              ),
+                                              // refresh data
+                                              IconButton(
+                                                onPressed: () {
+                                                  fetchFinancialInformation();
+                                                },
+                                                icon: const Icon(Icons.refresh),
+                                              )
+                                            ],
+                                          ),
+                                          _financialInformationCard(
+                                            "Invested Amount",
+                                            totalInvestedAmount,
+                                          ),
+                                          _financialInformationCard(
+                                            "Interest Earned",
+                                            totalInterestEarned,
+                                          ),
+                                          _financialInformationCard(
+                                            "Current Month Interest",
+                                            totalIntrestEarnedThisMonth,
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  );
-                                },
-                              )
-                              );
+                                    );
+                                  },
+                                );
+                              });
                             },
                             icon: const Icon(Icons.info_rounded),
                             color: Colors.white,

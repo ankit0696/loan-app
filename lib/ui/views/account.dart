@@ -356,7 +356,7 @@ class _AccountState extends State<Account> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Header(
-                            title: "Intrest rate",
+                            title: "Interest rate",
                             fontSize: 15.0,
                             color: Colors.white),
                         Header(

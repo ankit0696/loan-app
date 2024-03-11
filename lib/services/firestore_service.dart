@@ -59,11 +59,13 @@ class FirestoreService {
 
   // get loans data
   Stream<QuerySnapshot> getLoans(String borrowerId) {
+    // order by isActive from true to false
     try {
       return _db
           .collection(_losnCollection)
           .where('borrowerId', isEqualTo: borrowerId)
           .where('lenderId', isEqualTo: AuthService().user.uid)
+          .orderBy('isActive', descending: true)
           .snapshots();
     } catch (e) {
       print(e);
