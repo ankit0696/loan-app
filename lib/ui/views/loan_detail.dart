@@ -254,8 +254,9 @@ class _LoanState extends State<Loan> {
                     // FirestoreService().deleteTransaction(transaction.id);
                   },
                   child: const CircleAvatar(
-                    backgroundImage: NetworkImage(
-                        "https://avatars.githubusercontent.com/u/61448739?v=4"),
+                    radius: 20.0,
+                    backgroundColor: Color(0xFFF7CF18),
+                    child: Icon(Icons.attach_money_rounded, color: Colors.white),
                   ),
                 ),
                 title: Column(

@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:loan_app/models/borrower.dart';
 import 'package:loan_app/models/transaction.dart';
 import 'package:loan_app/services/firestore_service.dart';
+import 'package:loan_app/ui/shimmer_screens/transaction_card.dart';
 import 'package:loan_app/ui/widgets/app_background.dart';
 import 'package:loan_app/ui/widgets/custom_back_button.dart';
-import 'package:loan_app/ui/widgets/formate_amount.dart';
+// import 'package:loan_app/ui/widgets/formate_amount.dart';
 import 'package:loan_app/ui/widgets/header.dart';
+import 'package:loan_app/ui/widgets/transaction_card_widget.dart';
 
 class AllTransactions extends StatefulWidget {
   const AllTransactions({super.key});
@@ -116,7 +118,7 @@ class _AllTransactionsState extends State<AllTransactions> {
                     style: TextStyle(color: Colors.red)));
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: TransactionCardShimmer());
           }
           if (snapshot.data!.docs.isEmpty) {
             return const Center(child: Text("No Data Found"));
@@ -137,17 +139,18 @@ class _AllTransactionsState extends State<AllTransactions> {
                               style: TextStyle(color: Colors.red)));
                     }
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(child: TransactionCardShimmer());
                     }
 
                     BorrowerModel borrower = BorrowerModel.fromJson(
                         snapshot.data!.docs[0].data() as Map<String, dynamic>);
 
                     return ListTile(
-                      leading: const CircleAvatar(
-                        backgroundImage: NetworkImage(
-                            "https://avatars.githubusercontent.com/u/61448739?v=4"),
-                      ),
+                      leading: CircleAvatar(
+                          child: Text(
+                        getInitials(borrower.name),
+                        style: const TextStyle(color: Colors.white),
+                      )),
                       title: transactionCard(transaction),
                       subtitle: Text(transaction.description ?? "",
                           style: const TextStyle(
@@ -171,48 +174,4 @@ class _AllTransactionsState extends State<AllTransactions> {
         });
   }
 
-  Column transactionCard(TransactionModel transaction) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(formatAmount(transaction.amount),
-                style: const TextStyle(fontSize: 15, color: Colors.black)),
-            Container(
-              margin: const EdgeInsets.only(left: 5.0),
-              padding: const EdgeInsets.all(2.0),
-              decoration: BoxDecoration(
-                color: transaction.transactionType == "principal"
-                    ? Colors.green.shade200
-                    : Colors.blue.shade200,
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              child: Text(transaction.transactionType,
-                  style: const TextStyle(fontSize: 10, color: Colors.black)),
-            )
-          ],
-        ),
-        Text(transaction.dueDate.toIso8601String().split("T")[0],
-            style: const TextStyle(fontSize: 12, color: Colors.grey)),
-      ],
-    );
-  }
-
-  Container background(BuildContext context, double sizeHeight) {
-    return Container(
-      margin: EdgeInsets.only(
-        top: sizeHeight,
-      ),
-      height: MediaQuery.of(context).size.height * 0.80,
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30.0),
-          topRight: Radius.circular(30.0),
-        ),
-        color: Color(0xFFC78E07),
-      ),
-    );
-  }
 }

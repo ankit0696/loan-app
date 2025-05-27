@@ -71,14 +71,14 @@ class TransactionForm extends StatelessWidget {
     //     }
     //   }
     // }
-    print('last transaction ${lastTransaction?.amount}');
+    // print('last transaction ${lastTransaction?.amount}');
 
     for (var doc in docs) {
       TransactionModel transaction =
           TransactionModel.fromJson(doc.data() as Map<String, dynamic>);
       if (transaction.transactionType == 'interest') {
         // if (transaction.dueDate == lastTransaction!.dueDate) {
-          transactions.add(transaction);
+        transactions.add(transaction);
         // }
       }
     }
@@ -250,31 +250,33 @@ class _TransactionState extends State<Transaction> {
       // TODO: check if principal and interest rate is never zero
       int monthsPaidTillNow = totalIntrestPaidTillDate ~/ interestAmount;
 
-      double remainingInterest = totalIntrestPaidTillDate - (interestAmount * monthsPaidTillNow);
+      double remainingInterest =
+          totalIntrestPaidTillDate - (interestAmount * monthsPaidTillNow);
 
       // update due date to months paid till now + 1
       _dueDate = widget.loan.date.month < 12
-          ? DateTime(widget.loan.date.year, widget.loan.date.month + monthsPaidTillNow + 1,
+          ? DateTime(
+              widget.loan.date.year,
+              widget.loan.date.month + monthsPaidTillNow + 1,
               widget.loan.date.day)
           : DateTime(widget.loan.date.year + 1, 1, widget.loan.date.day);
 
       double transactionAmount = interestAmount - remainingInterest;
-        transactions.add(TransactionModel(
-          id: '',
-          amount: amount < transactionAmount ? amount : transactionAmount,
-          date: DateTime.now(),
-          createdDate: DateTime.now(),
-          dueDate: _dueDate,
-          borrowerId: widget.loan.borrowerId,
-          loanId: widget.loan.id,
-          lenderId: widget.loan.lenderId,
-          description: _descriptionController.text.isNotEmpty
-              ? _descriptionController.text
-              : null,
-          transactionType: _transactionType,
-          rawAmount: amountCopy,
-        ));
-
+      transactions.add(TransactionModel(
+        id: '',
+        amount: amount < transactionAmount ? amount : transactionAmount,
+        date: DateTime.now(),
+        createdDate: DateTime.now(),
+        dueDate: _dueDate,
+        borrowerId: widget.loan.borrowerId,
+        loanId: widget.loan.id,
+        lenderId: widget.loan.lenderId,
+        description: _descriptionController.text.isNotEmpty
+            ? _descriptionController.text
+            : null,
+        transactionType: _transactionType,
+        rawAmount: amountCopy,
+      ));
 
       double remainingAmount = amount - transactionAmount;
       while (remainingAmount > 0) {
@@ -286,7 +288,9 @@ class _TransactionState extends State<Transaction> {
         // add transaction
         transactions.add(TransactionModel(
           id: '',
-          amount: remainingAmount > interestAmount ? interestAmount : remainingAmount,
+          amount: remainingAmount > interestAmount
+              ? interestAmount
+              : remainingAmount,
           date: DateTime.now(),
           createdDate: DateTime.now(),
           dueDate: _dueDate,
@@ -302,12 +306,7 @@ class _TransactionState extends State<Transaction> {
 
         remainingAmount -= interestAmount;
       }
-
-
-
-
     } else {
-
       transactions.add(TransactionModel(
         id: '',
         amount: amount,
@@ -326,7 +325,6 @@ class _TransactionState extends State<Transaction> {
     }
     return transactions;
   }
-
 
 // total intrest paid till date
   double calculateTotalInterestPaid(List<TransactionModel> transactions) {

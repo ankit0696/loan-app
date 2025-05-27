@@ -455,7 +455,7 @@ class FirestoreService {
 
       for (QueryDocumentSnapshot loanDoc in loansSnapshot.docs) {
         // Calculate and add the loan amount to the total invested amount
-        double loanAmount = loanDoc.get('amount');
+        double loanAmount = loanDoc.get('amount').toDouble();
         totalInvestedAmount += loanAmount;
       }
 

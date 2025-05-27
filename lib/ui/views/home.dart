@@ -18,6 +18,7 @@ import 'package:loan_app/ui/widgets/circular_avatar.dart';
 import 'package:loan_app/ui/widgets/custom_snackbar.dart';
 import 'package:loan_app/ui/widgets/formate_amount.dart';
 import 'package:loan_app/ui/widgets/header.dart';
+import 'package:loan_app/ui/widgets/transaction_card_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -257,48 +258,6 @@ class _HomeState extends State<Home> {
                               title: "Welcome Back!",
                               fontSize: 20.0,
                               color: Colors.black),
-                          // make a small i icon
-                          // IconButton(
-                          //   onPressed: () async {
-                          //     fetchFinancialInformation()
-                          //         .then((value) => showDialog(
-                          //               context: context,
-                          //               builder: (BuildContext context) {
-                          //                 // return AlertDialog(
-                          //                 //   title: const Text('Financial Information'),
-                          //                 //   content: Column(
-                          //                 //     crossAxisAlignment:
-                          //                 //         CrossAxisAlignment.start,
-                          //                 //     mainAxisSize: MainAxisSize.min,
-                          //                 //     children: [
-                          //                 //       _financialInformationCard(
-                          //                 //           "Invested Amount",
-                          //                 //           totalInvestedAmount),
-                          //                 //       _financialInformationCard(
-                          //                 //           "Interest Earned",
-                          //                 //           totalInterestEarned),
-                          //                 //       _financialInformationCard(
-                          //                 //           "Current Month Intrest",
-                          //                 //           totalIntrestEarnedThisMonth )
-                          //                 //       // Add other financial information cards as needed
-                          //                 //     ],
-                          //                 //   ),
-                          //                 //   actions: <Widget>[
-                          //                 //     ElevatedButton(
-                          //                 //       onPressed: () {
-                          //                 //         Navigator.of(context).pop();
-                          //                 //       },
-                          //                 //       child: const Text('Close'),
-                          //                 //     ),
-                          //                 //   ],
-                          //                 // );
-
-                          //               },
-                          //             ));
-                          //   },
-                          //   icon: const Icon(Icons.info_rounded),
-                          //   color: Colors.white,
-                          // ),
                           IconButton(
                             onPressed: () async {
                               fetchFinancialInformation().then((value) {
@@ -327,7 +286,8 @@ class _HomeState extends State<Home> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               const Header(
                                                 title: "Financial Information",
@@ -398,14 +358,6 @@ class _HomeState extends State<Home> {
               ),
             ],
           ),
-          // Column(
-          //   children: [
-          //     _financialInformationCard("Invested Amount", totalInvestedAmount),
-          //     _financialInformationCard("Interest Earned", totalInterestEarned),
-          //     // _financialInformationCard(
-          //     //     "Principal Earned", totalPrincipalEarned),
-          //   ],
-          // )
         ],
       ),
     );
@@ -556,12 +508,21 @@ class _HomeState extends State<Home> {
                                 },
                                 child: Column(
                                   children: [
-                                    const CircularAvatar(
-                                      imageUrl:
-                                          "https://avatars.githubusercontent.com/u/61448739?v=4",
-                                      // borrower.imageUrl ?? "", // check for null
-                                      radius: 60.0,
-                                    ),
+                                    // const CircularAvatar(
+                                    //   imageUrl:
+                                    //       "https://avatars.githubusercontent.com/u/61448739?v=4",
+                                    //   // borrower.imageUrl ?? "", // check for null
+                                    //   radius: 60.0,
+                                    // ),
+                                    CircleAvatar(
+                                        backgroundColor:
+                                            const Color(0xFFF7CF18),
+                                        radius: 30.0,
+                                        child: Text(
+                                          getInitials(borrower.name),
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        )),
                                     const SizedBox(height: 10.0),
                                     SizedBox(
                                       width: 75.0,
@@ -631,43 +592,13 @@ class _HomeState extends State<Home> {
                         snapshot.data!.docs[0].data() as Map<String, dynamic>);
 
                     return ListTile(
-                      leading: const CircleAvatar(
-                        backgroundImage: NetworkImage(
-                            "https://avatars.githubusercontent.com/u/61448739?v=4"),
-                      ),
-                      title: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(formatAmount(transaction.amount),
-                                  style: const TextStyle(
-                                      fontSize: 15, color: Colors.black)),
-                              Container(
-                                margin: const EdgeInsets.only(left: 5.0),
-                                padding: const EdgeInsets.all(2.0),
-                                decoration: BoxDecoration(
-                                  color:
-                                      transaction.transactionType == "principal"
-                                          ? Colors.green.shade200
-                                          : Colors.blue.shade200,
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                                child: Text(transaction.transactionType,
-                                    style: const TextStyle(
-                                        fontSize: 10, color: Colors.black)),
-                              )
-                            ],
-                          ),
-                          Text(
-                              transaction.dueDate
-                                  .toIso8601String()
-                                  .split("T")[0],
-                              style: const TextStyle(
-                                  fontSize: 12, color: Colors.grey)),
-                        ],
-                      ),
+                      leading: CircleAvatar(
+                          backgroundColor: const Color(0xFFF7CF18),
+                          child: Text(
+                            getInitials(borrower.name),
+                            style: const TextStyle(color: Colors.white),
+                          )),
+                      title: transactionCard(transaction),
                       subtitle: Text(transaction.description ?? "",
                           style: const TextStyle(
                               fontSize: 12, color: Colors.grey)),
@@ -688,75 +619,6 @@ class _HomeState extends State<Home> {
             },
           );
         });
-  }
-
-  Widget _floatingActionButton() {
-    return FloatingActionButton(
-      onPressed: () {
-        // Alert dialog
-        _alertBox();
-      },
-      child: const Icon(Icons.add),
-    );
-  }
-
-  Future<dynamic> _alertBox() {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shadowColor: Colors.white,
-          backgroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Create New", style: TextStyle(color: Colors.white)),
-              InkWell(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                    height: 25.0,
-                    width: 25.0,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color.fromARGB(255, 137, 136, 136),
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 13.0,
-                    )),
-              ),
-            ],
-          ),
-          content: const Text(
-              'Would you like to create a new loan or transaction?',
-              style: TextStyle(color: Colors.white)),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('New Loan'),
-              onPressed: () {
-                // Perform action for new loan
-                // Navigator.pushReplacement(context,
-                //     MaterialPageRoute(builder: (context) => LoanForm()));
-              },
-            ),
-            TextButton(
-              child: const Text('New Transaction'),
-              onPressed: () {
-                // Perform action for new transaction
-                // Navigator.pushReplacement(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => const TransactionForm()));
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Widget _spaceInBetween({double? height}) {

@@ -15,6 +15,7 @@ import 'package:loan_app/ui/widgets/custom_snackbar.dart';
 import 'package:loan_app/ui/widgets/formate_amount.dart';
 import 'package:loan_app/ui/widgets/header.dart';
 import 'package:loan_app/ui/widgets/textfield.dart';
+import 'package:loan_app/ui/widgets/transaction_card_widget.dart';
 
 class AccountPage extends StatelessWidget {
   final String borrowerId;
@@ -69,7 +70,6 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
-
   bool isExpanded = false;
   @override
   Widget build(BuildContext context) {
@@ -114,7 +114,8 @@ class _AccountState extends State<Account> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => BorrowForm(id: widget.borrower.id),
+                            builder: (context) =>
+                                BorrowForm(id: widget.borrower.id),
                           ),
                         );
                       },
@@ -140,11 +141,18 @@ class _AccountState extends State<Account> {
                         ),
                         borderRadius: BorderRadius.circular(100.0),
                       ),
-                      child: const CircularAvatar(
-                        imageUrl:
-                            "https://avatars.githubusercontent.com/u/61448739?v=4",
-                        radius: 80.0,
-                      ),
+                      // child: const CircularAvatar(
+                      //   imageUrl:
+                      //       "https://avatars.githubusercontent.com/u/61448739?v=4",
+                      //   radius: 80.0,
+                      // ),
+                      child: CircleAvatar(
+                        radius: 45.0,
+                        backgroundColor: const Color(0xFFF7CF18),
+                          child: Text(
+                        getInitials(widget.borrower.name),
+                        style: const TextStyle(color: Colors.white),
+                      )),
                     ),
                     const SizedBox(height: 20.0),
                     Header(
@@ -154,7 +162,8 @@ class _AccountState extends State<Account> {
                     ),
                     InkWell(
                       onTap: () {
-                        Clipboard.setData(ClipboardData(text: widget.borrower.phone));
+                        Clipboard.setData(
+                            ClipboardData(text: widget.borrower.phone));
                         customSnackbar(
                             message: "Copied to Clipboard", context: context);
                       },
@@ -224,11 +233,12 @@ class _AccountState extends State<Account> {
           children: [
             ExpansionPanel(
                 canTapOnHeader: true,
-                backgroundColor: isExpanded ? Colors.white: const Color(0xFFE7B60B),
-                isExpanded: isExpanded,                
+                backgroundColor:
+                    isExpanded ? Colors.white : const Color(0xFFE7B60B),
+                isExpanded: isExpanded,
                 headerBuilder: (BuildContext context, bool isExpanded) {
                   return const Center(
-                    child:  Header(
+                    child: Header(
                       title: "Personal Details",
                     ),
                   );
@@ -244,8 +254,8 @@ class _AccountState extends State<Account> {
                         disabled: true,
                         icon: Icons.copy,
                         onIconTap: () {
-                          Clipboard.setData(
-                              ClipboardData(text: widget.borrower.aadharNumber));
+                          Clipboard.setData(ClipboardData(
+                              text: widget.borrower.aadharNumber));
                           customSnackbar(
                               message: "Aadhar Copied", context: context);
                         },
@@ -268,8 +278,10 @@ class _AccountState extends State<Account> {
                 ))
           ]),
 
-      const SizedBox(height: 30.0),
-      const Header(title: "Loans", fontSize: 20.0),
+      // const SizedBox(height: 30.0),
+      // const Header(title: "Loans", fontSize: 20.0),
+      // Header(title: "Loans (Total Interest: ₹${totalInterest.toStringAsFixed(2)})", fontSize: 20.0),
+
       Expanded(
         child: _loans(context),
       ),
@@ -278,35 +290,111 @@ class _AccountState extends State<Account> {
   }
 
   _loans(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: stream,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const Center(child: Text("Something went wrong"));
-        }
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        // if (snapshot.data!.docs.isEmpty) {
-        //   return const Center(child: Text("No Data Found"));
-        // }
-        return ListView.builder(
-          shrinkWrap: true,
-          // physics: const BouncingScrollPhysics(),
-          itemCount: snapshot.data!.docs.length + 1,
-          itemBuilder: (context, index) {
-            if (index == snapshot.data!.docs.length) {
-              return _addNewLoan(context);
-            } else {
-              LoanModel loan = LoanModel.fromJson(
-                  snapshot.data!.docs[index].data() as Map<String, dynamic>);
+    // return StreamBuilder<QuerySnapshot>(
+    //   stream: stream,
+    //   builder: (context, snapshot) {
+    //     if (snapshot.hasError) {
+    //       return const Center(child: Text("Something went wrong"));
+    //     }
+    //     if (snapshot.connectionState == ConnectionState.waiting) {
+    //       return const Center(child: CircularProgressIndicator());
+    //     }
+    //     // if (snapshot.data!.docs.isEmpty) {
+    //     //   return const Center(child: Text("No Data Found"));
+    //     // }
 
-              return loanCard(context, loan);
-            }
-          },
-        );
-      },
+
+    //     List<DocumentSnapshot> docs = snapshot.data!.docs;
+
+  
+    //     // Calculate total interest
+    //     double total = 0.0;
+    //     for (var doc in docs) {
+    //       LoanModel loan =
+    //           LoanModel.fromJson(doc.data() as Map<String, dynamic>);
+    //       total += loan.amount * loan.interestRate / 100;
+    //     }
+
+    //     // Update state
+    //     WidgetsBinding.instance.addPostFrameCallback((_) {
+    //       setState(() {
+    //         totalInterest = total;
+    //       });
+    //     });
+
+
+
+    //     return ListView.builder(
+    //       shrinkWrap: true,
+    //       // physics: const BouncingScrollPhysics(),
+    //       itemCount: snapshot.data!.docs.length + 1,
+    //       itemBuilder: (context, index) {
+    //         if (index == snapshot.data!.docs.length) {
+    //           return _addNewLoan(context);
+    //         } else {
+    //           LoanModel loan = LoanModel.fromJson(
+    //               snapshot.data!.docs[index].data() as Map<String, dynamic>);
+
+    //           return loanCard(context, loan);
+    //         }
+    //       },
+    //     );
+    //   },
+    // );
+
+    return StreamBuilder<QuerySnapshot>(
+  stream: stream,
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+      return const Center(child: Text("No Data Found"));
+    }
+
+    List<DocumentSnapshot> docs = snapshot.data!.docs;
+
+    // Calculate total interest locally
+    double totalInterest = 0.0;
+    double totalAmount = 0.0;
+    final loans = docs.map((doc) {
+      final loan = LoanModel.fromJson(doc.data() as Map<String, dynamic>);
+      // if loan is active add to totalInterest
+      if (loan.isActive) {
+        totalInterest += loan.amount * loan.interestRate / 100;
+        totalAmount += loan.amount;
+      }
+
+
+      // totalInterest += loan.amount * loan.interestRate / 100;
+      return loan;
+    }).toList();
+
+    // Now display the totalInterest inside the UI
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text('Total Amount: ₹${totalAmount.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text('Total Interest: ₹${totalInterest.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: loans.length,
+            itemBuilder: (context, index) => loanCard(context, loans[index]),
+          ),
+        ),
+      ],
     );
+  },
+);
+
   }
 
   Widget loanCard(BuildContext context, LoanModel loan) {
@@ -357,6 +445,10 @@ class _AccountState extends State<Account> {
                       children: [
                         const Header(
                             title: "Interest rate",
+                            fontSize: 15.0,
+                            color: Colors.white),
+                        Header(
+                            title: loan.id,
                             fontSize: 15.0,
                             color: Colors.white),
                         Header(

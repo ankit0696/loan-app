@@ -8,6 +8,7 @@ import 'package:loan_app/ui/widgets/app_background.dart';
 import 'package:loan_app/ui/widgets/custom_back_button.dart';
 import 'package:loan_app/ui/widgets/custom_snackbar.dart';
 import 'package:loan_app/ui/widgets/header.dart';
+import 'package:loan_app/ui/widgets/transaction_card_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AllBorrowers extends StatefulWidget {
@@ -136,10 +137,17 @@ class _AllBorrowersState extends State<AllBorrowers> {
                     ),
                   );
                 },
-                leading: const CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "https://avatars.githubusercontent.com/u/61448739?v=4"),
-                ),
+                // leading: const CircleAvatar(
+                //   backgroundImage: NetworkImage(
+                //       "https://avatars.githubusercontent.com/u/61448739?v=4"),
+                // ),
+                leading: CircleAvatar(
+                                          backgroundColor: const Color(0xFFF7CF18),
+
+                    child: Text(
+                  getInitials(borrower.name),
+                  style: const TextStyle(color: Colors.white),
+                )),
                 title: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -30,8 +30,8 @@ class LoanModel {
 
     return LoanModel(
       id: json['id'],
-      amount: json['amount'],
-      interestRate: json['interestRate'],
+      amount: json['amount'].toDouble(),
+      interestRate: json['interestRate'].toDouble(),
       date: DateTime.parse(json['date']),
       borrowerId: json['borrowerId'],
       lenderId: json['lenderId'],
