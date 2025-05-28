@@ -6,6 +6,7 @@ class BorrowerModel {
   final String address;
   final String aadharNumber;
   final String lenderId;
+  // String? imageUrl;
 
   BorrowerModel({
     required this.id,
@@ -15,6 +16,7 @@ class BorrowerModel {
     required this.address,
     required this.aadharNumber,
     required this.lenderId,
+    // this.imageUrl,
   });
 
   Map<String, dynamic> toJson() => {
@@ -25,6 +27,7 @@ class BorrowerModel {
         'address': address,
         'aadharNumber': aadharNumber,
         'lenderId': lenderId,
+        // 'imageUrl': imageUrl
       };
 
   factory BorrowerModel.fromJson(Map<String, dynamic> json) => BorrowerModel(
@@ -35,5 +38,6 @@ class BorrowerModel {
         address: json['address'],
         aadharNumber: json['aadharNumber'],
         lenderId: json['lenderId'],
+        // imageUrl: json['imageUrl'],
       );
 }

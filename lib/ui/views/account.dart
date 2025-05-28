@@ -372,26 +372,57 @@ class _AccountState extends State<Account> {
     }).toList();
 
     // Now display the totalInterest inside the UI
+    // return Column(
+    //   children: [
+    //     Padding(
+    //       padding: const EdgeInsets.all(8.0),
+    //       child: Text('Total Amount: ₹${totalAmount.toStringAsFixed(2)}',
+    //           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    //     ),
+    //     Padding(
+    //       padding: const EdgeInsets.all(8.0),
+    //       child: Text('Total Interest: ₹${totalInterest.toStringAsFixed(2)}',
+    //           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    //     ),
+    //     Expanded(
+    //       child: ListView.builder(
+    //         itemCount: loans.length,
+    //         itemBuilder: (context, index) => loanCard(context, loans[index]),
+    //       ),
+    //     ),
+    //   ],
+    // );
     return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text('Total Amount: ₹${totalAmount.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text('Total Interest: ₹${totalInterest.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: loans.length,
-            itemBuilder: (context, index) => loanCard(context, loans[index]),
-          ),
-        ),
-      ],
-    );
+  children: [
+    Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        'Total Amount: ₹${totalAmount.toStringAsFixed(2)}',
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    ),
+    Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        'Total Interest: ₹${totalInterest.toStringAsFixed(2)}',
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    ),
+    Expanded(
+      child: ListView.builder(
+        itemCount: loans.length + 1, // +1 for the add button
+        itemBuilder: (context, index) {
+          if (index == loans.length) {
+            return _addNewLoan(context); // Add new loan at the end
+          } else {
+            return loanCard(context, loans[index]);
+          }
+        },
+      ),
+    ),
+  ],
+);
+
   },
 );
 

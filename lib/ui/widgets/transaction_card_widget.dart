@@ -51,11 +51,17 @@ Column transactionCard(TransactionModel transaction) {
   // return first letter of the string in capital
   // Shubham Kumar => SK
   // Text User => TU
-  String getInitials(String name) {
-    List<String> nameSplit = name.split(" ");
-    String initials = "";
-    for (var i = 0; i < nameSplit.length; i++) {
-      initials += nameSplit[i][0];
+ String getInitials(String name) {
+  if (name.trim().isEmpty) return "";
+
+  List<String> nameSplit = name.trim().split(" ");
+  String initials = "";
+
+  for (var part in nameSplit) {
+    if (part.isNotEmpty) {
+      initials += part[0];
     }
-    return initials.toUpperCase().trim();
   }
+
+  return initials.toUpperCase();
+}

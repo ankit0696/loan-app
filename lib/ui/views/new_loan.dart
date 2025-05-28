@@ -358,6 +358,14 @@ class _LoanFormState extends State<LoanForm> {
                                               collateral.imageUrl,
                                             )),
                                       title: Text(collateral.description),
+                                      trailing: IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        onPressed: () {
+                                          setState(() {
+                                            collaterals.remove(collateral);
+                                          });
+                                        },
+                                      ),
 
                                       onTap: (() {
                                         showImageDialog(
